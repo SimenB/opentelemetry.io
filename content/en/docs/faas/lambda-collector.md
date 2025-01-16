@@ -3,6 +3,7 @@ title: Lambda Collector Configuration
 linkTitle: Lambda Collector Config
 weight: 11
 description: Add and configure the Collector Lambda layer to your Lambda
+cSpell:ignore: ADOT awsxray configmap confmap loglevel regionalized
 ---
 
 The OpenTelemetry community offers the Collector in a separate Lambda layer from
@@ -15,12 +16,15 @@ bundles instrumentation and the Collector together.
 Once you've instrumented your application you should add the Collector Lambda
 layer to collect and submit your data to your chosen backend.
 
+Find the
+[most recent Collector layer release](https://github.com/open-telemetry/opentelemetry-lambda/releases)
+and use it's ARN after changing the `<region>` tag to the region your Lambda is
+in.
+
 Note: Lambda layers are a regionalized resource, meaning that they can only be
 used in the Region in which they are published. Make sure to use the layer in
-the same region as your Lambda functions.
-
-Find the supported regions and amd64(x86_64)/arm64 layer ARN in the table below
-for the ARNs to consume.
+the same region as your Lambda functions. The community publishes layers in all
+available regions.
 
 ### Configure the OTel Collector
 
@@ -41,7 +45,7 @@ already present. Configure your exporter(s) using the environment variables you
 set for your access tokens in the previous step.
 
 **Without an environment variable being set for your exporters the default
-configuration only supports emitting data using the logging exporter.** Here is
+configuration only supports emitting data using the debug exporter.** Here is
 the default configuration:
 
 ```yaml
@@ -49,22 +53,23 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 'localhost:4317'
+        endpoint: '0.0.0.0:4317'
       http:
-        endpoint: 'localhost:4318'
+        endpoint: '0.0.0.0:4318'
 
 exporters:
-  logging:
-    loglevel: debug
+  # NOTE: Prior to v0.86.0 use `logging` instead of `debug`.
+  debug:
+    verbosity: detailed
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [logging]
+      exporters: [debug]
     metrics:
       receivers: [otlp]
-      exporters: [logging]
+      exporters: [debug]
   telemetry:
     metrics:
       address: localhost:8888
@@ -94,7 +99,7 @@ Here is a sample configuration file of `collector.yaml` in the root directory:
 
 ```yaml
 #collector.yaml in the root directory
-#Set an environemnt variable 'OPENTELEMETRY_COLLECTOR_CONFIG_FILE' to '/var/task/collector.yaml'
+#Set an environment variable 'OPENTELEMETRY_COLLECTOR_CONFIG_URI' to '/var/task/collector.yaml'
 
 receivers:
   otlp:
@@ -105,7 +110,8 @@ receivers:
         endpoint: 'localhost:4318'
 
 exporters:
-  logging:
+  # NOTE: Prior to v0.86.0 use `logging` instead of `debug`.
+  debug:
   awsxray:
 
 service:
@@ -115,7 +121,7 @@ service:
       exporters: [awsxray]
     metrics:
       receivers: [otlp]
-      exporters: [logging]
+      exporters: [debug]
   telemetry:
     metrics:
       address: localhost:8888
@@ -123,11 +129,11 @@ service:
 
 #### Map your Custom Configuration File using Environment Variables
 
-Once your collector configuration is set through a confmap providers. Create an
+Once your collector configuration is set through a confmap provider, create an
 environment variable on your Lambda function
-`OPENTELEMETRY_COLLECTOR_CONFIG_FILE` and set the path of configuration w.r.t to
+`OPENTELEMETRY_COLLECTOR_CONFIG_URI` and set the path of configuration w.r.t to
 the confmap provider as its value. for e.g, if you are using a file configmap
-provider, set its value to `/var/task/*<path>/<to>/<filename>\_`. This will tell
+provider, set its value to `/var/task/<path>/<to>/<filename>`. This will tell
 the extension where to find the collector configuration.
 
 ##### Custom Collector Configuration Using the CLI
@@ -135,7 +141,7 @@ the extension where to find the collector configuration.
 You can set this via the Lambda console, or via the AWS CLI.
 
 ```bash
-aws lambda update-function-configuration --function-name Function --environment Variables={OPENTELEMETRY_COLLECTOR_CONFIG_FILE=/var/task/collector.yaml}
+aws lambda update-function-configuration --function-name Function --environment Variables={OPENTELEMETRY_COLLECTOR_CONFIG_URI=/var/task/collector.yaml}
 ```
 
 ##### Set Configuration Environment Variables from CloudFormation
@@ -149,7 +155,7 @@ Function:
     ...
     Environment:
       Variables:
-        OPENTELEMETRY_COLLECTOR_CONFIG_FILE: /var/task/collector.yaml
+        OPENTELEMETRY_COLLECTOR_CONFIG_URI: /var/task/collector.yaml
 ```
 
 ##### Load Configuration from an S3 Object
@@ -158,11 +164,11 @@ Loading configuration from S3 will require that the IAM role attached to your
 function includes read access to the relevant bucket.
 
 ```yaml
-  Function:
-    Type: AWS::Serverless::Function
-    Properties:
-      ...
-      Environment:
-        Variables:
-          OPENTELEMETRY_COLLECTOR_CONFIG_FILE: s3://<bucket_name>.s3.<region>.amazonaws.com/collector_config.yaml
+Function:
+  Type: AWS::Serverless::Function
+  Properties:
+    ...
+    Environment:
+      Variables:
+        OPENTELEMETRY_COLLECTOR_CONFIG_URI: s3://<bucket_name>.s3.<region>.amazonaws.com/collector_config.yaml
 ```

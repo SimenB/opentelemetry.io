@@ -3,6 +3,7 @@ title: OpenTelemetry in Focus, April 2023
 linkTitle: OTel in Focus 2023/04
 date: 2023-05-01
 author: '[Austin Parker](https://github.com/austinlparker)'
+cSpell:ignore: confmap renamings
 ---
 
 Welcome to this month’s edition of **OpenTelemetry in Focus**! It's been another
@@ -19,6 +20,8 @@ channel.
 ## Releases and Updates
 
 Here are the latest updates from some of our core repositories.
+
+<!-- markdownlint-disable heading-increment -->
 
 ##### [Specification](/docs/specs/otel/)
 
@@ -47,17 +50,17 @@ has been released for the collector. The
 [operator](https://github.com/open-telemetry/opentelemetry-operator/releases/tag/v0.75.0)
 has been updated to v0.75.0, adding support for feature gates in the operator.
 
-This release includes several bug fixes and improvements to connectors, along
+This release includes several bugfixes and improvements to connectors, along
 with a breaking change to the `confmap` component.
 
-##### [Go](/docs/instrumentation/go/)
+##### [Go](/docs/languages/go/)
 
 [Version v1.15.0](https://github.com/open-telemetry/opentelemetry-go/releases/tag/v1.15.0)
 has been released! This marks the official release of OpenTelemetry Metrics v1
 in Go. Please check out the full release notes, as there are several important
 changes and renamings, especially if you're using metrics.
 
-##### [Java](/docs/instrumentation/java/)
+##### [Java](/docs/languages/java/)
 
 [Version 1.25.0](https://github.com/open-telemetry/opentelemetry-java/releases/tag/v1.25.0)
 of the Java SDK has been released, with several bugfixes and improvements.

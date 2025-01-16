@@ -1,22 +1,75 @@
-{{ $isExternal := hasPrefix .Destination "http" -}}
+{{ $url := .Destination -}}
+
+{{/*
+
+  Localization link processing
+
+  The following code will prefix $url with the language code of this page when:
+
+  - This page's localization isn't the default localization (English)
+  - $url is an absolute path -- that is, it starts with /
+  - The $url target page exists in this locale
+
+  */ -}}
+
+{{ if hasPrefix $url "/" -}}
+  {{/* Hard-coded default lang since it's what's most efficient and won't change :) */ -}}
+  {{ $defaultLang := "en" -}}
+  {{ $lang := .Page.Language.Lang -}}
+  {{ if ne $lang $defaultLang -}}
+    {{ $langPathPrefix := add "/" $lang "/" -}}
+    {{ if and (hasPrefix $url $langPathPrefix) .Page.File -}}
+      {{ warnf "File %s: drop unnecessary '%s' prefix from %s"
+              .Page.File.Filename $langPathPrefix $url -}}
+    {{ else -}}
+      {{ $u := urls.Parse $url -}}
+      {{ $localizedPagePath := add $langPathPrefix (strings.TrimPrefix "/" $url) -}}
+      {{/*
+        Look for the page (referenced by $url) in this page's locale's site.
+        Note that .Page.GetPage exclusively looks for the given path in the same locale as .Page.
+      */ -}}
+      {{ with .Page.GetPage $u.Path -}}
+        {{/* warnf "Found url %s -> page %s. -- relRef %s" $localizedPagePath . (.RelRef (dict "path" $url))*/ -}}
+        {{/* Assert (eq $localizedPagePath (.RelRef (dict "path" $url))) */ -}}
+        {{ $url = $localizedPagePath -}}
+      {{ else -}}
+        {{/* Use $url as is, letting the link checker report any issues. */ -}}
+        {{/* warnf "Render-link: locale %s doesn't have the page %s (%s)" $lang $url $localizedPagePath */ -}}
+      {{ end -}}
+    {{ end -}}
+  {{ end -}}
+{{ end -}}
+
+{{/* General link-render processing */ -}}
+
+{{ $isExternal := hasPrefix $url "http" -}}
 {{ if $isExternal -}}
-  {{ if findRE "^https://opentelemetry.io/\\w" .Destination -}}
+  {{ if findRE "^https://opentelemetry.io/\\w" $url -}}
     {{ warnf "%s: use a local path, not an external URL, for the following reference to a site local page: %s"
-        .Page.File.Path .Destination -}}
-  {{ else if findRE "^https://github.com/open-telemetry/opentelemetry-specification/(blob|tree)/main/specification/\\w" .Destination -}}
+        .Page.File.Path $url -}}
+  {{ else if or
+    (findRE "^https://github.com/open-telemetry/opentelemetry-specification/(blob|tree)/main/specification/\\w" $url)
+    (findRE "^https://github.com/open-telemetry/opentelemetry-proto/(blob|tree)/main/docs/specification" $url)
+    (findRE "^https://github.com/open-telemetry/semantic-conventions/(blob|tree)/main/docs" $url)
+    -}}
     {{ warnf "%s: use a local path, not an external URL, for the following reference to a local specification page: %s"
-    .Page.File.Path .Destination -}}
+    .Page.File.Path $url -}}
   {{ end -}}
 {{ end -}}
 
 {{/* Until Hugo supports hook params (https://github.com/gohugoio/hugo/issues/6670), we'll inspect .Text. */ -}}
-{{ $noExternalIcon := in .Text "hk-no-external-icon" -}}
-<a href="{{ .Destination | safeURL }}"
+
+<a href="{{ $url | safeURL }}"
   {{- with .Title}} title="{{ . }}"{{ end -}}
   {{- if $isExternal }} target="_blank" rel="noopener"
-    {{- if not $noExternalIcon }} class="external-link"{{ end -}}
+    {{- $noExternalIcon := in .Text "hk-no-external-icon" -}}
+    {{ if not $noExternalIcon }} class="external-link"{{ end -}}
   {{ end -}}
 >
   {{- .Text | safeHTML -}}
 </a>
-{{- /* This comment ensures that all trailing whitespace is trimmed. */ -}}
+
+{{- /*
+  cSpell:ignore warnf
+  This comment ensures that all trailing whitespace is trimmed.
+*/ -}}

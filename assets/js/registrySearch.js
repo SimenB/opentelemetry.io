@@ -1,167 +1,95 @@
-let summaryInclude = 60;
-let fuseOptions = {
-  shouldSort: true,
-  includeMatches: true,
-  threshold: 0.1,
-  tokenize: true,
-  location: 0,
-  distance: 100,
-  maxPatternLength: 32,
-  minMatchCharLength: 1,
-  keys: [
-    { name: 'title', weight: 0.8 },
-    { name: 'description', weight: 0.5 },
-    { name: 'tags', weight: 0.3 },
-    { name: 'categories', weight: 0.3 },
-  ],
+const miniSearchOptions = {
+  fields: [
+    'title',
+    'description',
+    '_key',
+    'tags',
+    'package.name',
+    'flags',
+    'license',
+    'language',
+    'registryType',
+  ], // fields to index for full-text search
+  storeFields: ['title', '_key'], // fields to return with search results
+  extractField: (document, fieldName) => {
+    if (Array.isArray(document[fieldName])) {
+      return document[fieldName].join(' ');
+    }
+    return fieldName.split('.').reduce((doc, key) => doc && doc[key], document);
+  },
+  searchOptions: {
+    prefix: true,
+    boost: {
+      title: 4,
+      tags: 3,
+      description: 2,
+    },
+    fuzzy: 0.2,
+  },
 };
+
+const originalDocumentTitle = document.title;
+
+let fetched = false;
+const miniSearch = new MiniSearch(miniSearchOptions);
 
 // Get searchQuery for queryParams
 let pathName = window.location.pathname;
 let searchQuery = '';
 let selectedLanguage = 'all';
 let selectedComponent = 'all';
+let selectedFlag = 'all'; // Added selectedFlag
 
 parseUrlParams();
 
 if (pathName.includes('registry')) {
   // Run search or display default body
   if (searchQuery) {
-    document.querySelector('#search-query').value = searchQuery;
-    document.querySelector('#default-body').style.display = 'none';
     executeSearch(searchQuery);
   } else {
-    let defaultBody = document.querySelector('#default-body');
-    if (defaultBody.style.display === 'none') {
-      defaultBody.style.display = 'block';
-    }
+    showBody();
   }
 
-  if (selectedLanguage !== 'all' || selectedComponent !== 'all') {
+  // Set the dropdown values from query params
+  if (
+    selectedLanguage !== 'all' ||
+    selectedComponent !== 'all' ||
+    selectedFlag !== 'all'
+  ) {
     if (selectedLanguage !== 'all') {
       document.getElementById('languageDropdown').textContent =
         document.getElementById(
-          `language-item-${selectedLanguage}`
+          `language-item-${selectedLanguage}`,
         ).textContent;
     }
     if (selectedComponent !== 'all') {
       document.getElementById('componentDropdown').textContent =
         document.getElementById(
-          `component-item-${selectedComponent}`
+          `component-item-${selectedComponent}`,
         ).textContent;
+    }
+    if (selectedFlag !== 'all') {
+      document.getElementById('flagsDropdown').textContent =
+        document.getElementById(`flag-item-${selectedFlag}`).textContent;
     }
     updateFilters();
   }
-}
 
-// Runs search through Fuse for fuzzy search
-function executeSearch(searchQuery) {
-  fetch('/ecosystem/registry/index.json')
-    .then((res) => res.json())
-    .then((json) => {
-      let fuse = new Fuse(json, fuseOptions);
-      let results = fuse.search(searchQuery);
-
-      if (results.length > 0) {
-        populateResults(results);
-      } else {
-        document.querySelector('#search-results').innerHTML +=
-          '<p>No matches found</p>';
-      }
-    });
-}
-
-// Populate the search results and render to the page
-function populateResults(results) {
-  results.forEach((result, key) => {
-    let contents = result.item.description;
-    let snippet = '';
-    let snippetHighlights = [];
-
-    if (fuseOptions.tokenize) {
-      snippetHighlights.push(searchQuery);
-    } else {
-      result.matches.forEach((match) => {
-        if (match.key === 'tags' || match.key === 'categories') {
-          snippetHighlights.push(match.value);
-        } else if (match.key === 'description') {
-          start =
-            match.indices[0][0] - summaryInclude > 0
-              ? match.indices[0][0] - summaryInclude
-              : 0;
-          end =
-            match.indices[0][1] + summaryInclude < contents.length
-              ? match.indices[0][1] + summaryInclude
-              : contents.length;
-          snippet += contents.substring(start, end);
-          snippetHighlights.push(
-            match.value.substring(
-              match.indices[0][0],
-              match.indices[0][1] - mvalue.indices[0][0] + 1
-            )
-          );
-        }
-      });
-    }
-
-    if (snippet.length < 1 && contents.length > 0) {
-      snippet += contents.substring(0, summaryInclude * 2);
-    }
-
-    // Pull template from hugo template definition
-    let templateDefinition = document.querySelector(
-      '#search-result-template'
-    ).innerHTML;
-
-    // Replace values from template with search results
-    let output = render(templateDefinition, {
-      key: key,
-      title: result.item.title,
-      link: result.item.permalink,
-      tags: result.item.tags,
-      categories: result.item.categories,
-      description: result.item.description,
-      repo: result.item.repo,
-      registryType: result.item.registryType,
-      language: result.item.language,
-      snippet: snippet,
-      otVersion: result.item.otVersion,
-    });
-    document.querySelector('#search-results').innerHTML += output;
-  });
-}
-
-// Helper function to generate HTML for a search result
-function render(templateString, data) {
-  let conditionalMatches, conditionalPattern, copy;
-  conditionalPattern = /\$\{\s*isset ([a-zA-Z]*) \s*\}(.*)\$\{\s*end\s*}/g;
-  //since loop below depends on re.lastInxdex, we use a copy to capture any manipulations whilst inside the loop
-  copy = templateString;
-  while (
-    (conditionalMatches = conditionalPattern.exec(templateString)) !== null
-  ) {
-    if (data[conditionalMatches[1]]) {
-      //valid key, remove conditionals, leave contents.
-      copy = copy.replace(conditionalMatches[0], conditionalMatches[2]);
-    } else {
-      //not valid, remove entire section
-      copy = copy.replace(conditionalMatches[0], '');
-    }
-  }
-  templateString = copy;
-
-  //now any conditionals removed we can do simple substitution
-  let key, find, re;
-  for (key in data) {
-    find = '\\$\\{\\s*' + key + '\\s*\\}';
-    re = new RegExp(find, 'g');
-    templateString = templateString.replace(re, data[key]);
-  }
-  return templateString;
-}
-
-if (pathName.includes('registry')) {
   document.addEventListener('DOMContentLoaded', (event) => {
+    let searchForm = document.getElementById('searchForm');
+    searchForm.addEventListener('submit', function (evt) {
+      evt.preventDefault();
+      let val = document.getElementById('input-s').value;
+      setInput('s', val);
+      parseUrlParams();
+      executeSearch(searchQuery);
+    });
+
+    let searchInput = document.getElementById('input-s');
+    searchInput.addEventListener('keyup', function (evt) {
+      autoSuggest(evt.target.value);
+    });
+
     let languageList = document
       .getElementById('languageFilter')
       .querySelectorAll('.dropdown-item');
@@ -176,7 +104,7 @@ if (pathName.includes('registry')) {
           evt.target.textContent;
         setInput('language', val);
         updateFilters();
-      })
+      }),
     );
     typeList.forEach((element) =>
       element.addEventListener('click', function (evt) {
@@ -186,9 +114,117 @@ if (pathName.includes('registry')) {
           evt.target.textContent;
         setInput('component', val);
         updateFilters();
-      })
+      }),
+    );
+    // Flags dropdown event listener
+
+    let flagList = document
+      .getElementById('flagsFilter')
+      .querySelectorAll('.dropdown-item');
+
+    flagList.forEach((element) =>
+      element.addEventListener('click', function (evt) {
+        let val = evt.target.getAttribute('value');
+        selectedFlag = val;
+        document.getElementById('flagsDropdown').textContent =
+          evt.target.textContent;
+        setInput('flag', val);
+        updateFilters();
+      }),
     );
   });
+}
+
+function showBody() {
+  document.title = originalDocumentTitle;
+  document.querySelector('#search-results').innerHTML = '';
+  let defaultBody = document.querySelector('#default-body');
+  if (defaultBody.style.display === 'none') {
+    defaultBody.style.display = 'block';
+  }
+}
+
+// Runs search through Fuse for fuzzy search
+function executeSearch(searchQuery) {
+  if (searchQuery === '') {
+    showBody();
+    return;
+  }
+
+  document.title = searchQuery + ' at ' + originalDocumentTitle;
+  document.querySelector('#input-s').value = searchQuery;
+  document.querySelector('#default-body').style.display = 'none';
+  document.querySelector('#search-results').innerHTML = '';
+  document.getElementById('search-loading').style.display = 'block';
+
+  const run = function (searchQuery) {
+    // The 0-timeout is here if search is blocking, such that the "search loading" is rendered properly
+    setTimeout(() => {
+      let results = miniSearch.search(searchQuery);
+      document.getElementById('search-loading').style.display = 'none';
+
+      if (results.length > 0) {
+        populateResults(results);
+      } else {
+        document.querySelector('#search-results').innerHTML +=
+          '<p>No matches found</p>';
+      }
+    }, 0);
+  };
+
+  if (fetched) {
+    run(searchQuery);
+  } else {
+    fetch('/ecosystem/registry/index.json')
+      .then((res) => res.json())
+      .then((json) => {
+        fetched = true;
+        miniSearch.addAll(json);
+        run(searchQuery);
+      });
+  }
+}
+
+function autoSuggest(value) {
+  if (value === '') {
+    return;
+  }
+
+  const run = function (value) {
+    const suggestions = miniSearch.autoSuggest(value, {
+      // we only use title, otherwise we get strange suggestions, especially with description
+      fields: ['title'],
+    });
+    const list = document.getElementById('search-suggestions');
+    list.innerHTML = suggestions
+      .map(({ suggestion }) => `<option>${suggestion}</option>`)
+      .join('');
+  };
+
+  if (fetched) {
+    run(value);
+  } else {
+    fetch('/ecosystem/registry/index.json')
+      .then((res) => res.json())
+      .then((json) => {
+        fetched = true;
+        miniSearch.addAll(json);
+        run(value);
+      });
+  }
+}
+
+// Populate the search results and render to the page
+function populateResults(results) {
+  document.querySelector('#search-results').innerHTML += results.reduce(
+    (acc, result) => {
+      return (
+        acc +
+        document.querySelector(`[data-registry-id="${result._key}"]`).outerHTML
+      );
+    },
+    '',
+  );
 }
 
 function setInput(key, value) {
@@ -198,24 +234,39 @@ function setInput(key, value) {
   history.replaceState(null, null, '?' + queryParams.toString());
 }
 
-// Filters items based on language and component filters
+// Filters items based on language, component and flags
 function updateFilters() {
   let allItems = [...document.getElementsByClassName('registry-entry')];
-  if (selectedComponent === 'all' && selectedLanguage === 'all') {
+  if (
+    selectedComponent === 'all' &&
+    selectedLanguage === 'all' &&
+    selectedFlag === 'all'
+  ) {
+    // Show all items if all filters are set to 'all'
     allItems.forEach((element) => element.classList.remove('d-none'));
   } else {
+    // Apply the filters
     allItems.forEach((element) => {
       const dc = element.dataset.registrytype;
       const dl = element.dataset.registrylanguage;
-      if (
-        (dc === selectedComponent || selectedComponent === 'all') &&
-        (dl === selectedLanguage || selectedLanguage === 'all')
-      ) {
+      const df = element.dataset.registryflags
+        ? element.dataset.registryflags.split(' ').map((f) => f.toLowerCase())
+        : [];
+
+      const componentMatches =
+        dc === selectedComponent || selectedComponent === 'all';
+      const languageMatches =
+        dl === selectedLanguage || selectedLanguage === 'all';
+      const flagMatches =
+        selectedFlag === 'all' || df.includes(selectedFlag.toLowerCase());
+
+      if (flagMatches) {
+        console.log('Flag matches:', df);
+      }
+
+      if (componentMatches && languageMatches && flagMatches) {
+        // Changed
         element.classList.remove('d-none');
-      } else if (dc === selectedComponent && dl !== selectedLanguage) {
-        element.classList.add('d-none');
-      } else if (dl === selectedLanguage && dc !== selectedComponent) {
-        element.classList.add('d-none');
       } else {
         element.classList.add('d-none');
       }
@@ -223,9 +274,11 @@ function updateFilters() {
   }
 }
 
+// Parse URL parameters and update variables
 function parseUrlParams() {
   let urlParams = new URLSearchParams(window.location.search);
   searchQuery = urlParams.get('s');
   selectedLanguage = urlParams.get('language') || 'all';
   selectedComponent = urlParams.get('component') || 'all';
+  selectedFlag = urlParams.get('flag') || 'all'; // Added
 }

@@ -4,8 +4,8 @@ title:
   Convention Convergence
 linkTitle: ECS and OTel SemConv Convergence
 date: 2023-04-17
-spelling: cSpell:ignore ECS Reiley SemConv Yang
 author: '[Reiley Yang](https://github.com/reyang)'
+cSpell:ignore: ECS Reiley SemConv Yang
 ---
 
 Today, we're very excited to make a joint announcement with
@@ -18,7 +18,7 @@ single open schema that is maintained by OpenTelemetry, so that OpenTelemetry
 Semantic Conventions truly is a successor of the Elastic Common Schema.
 OpenTelemetry shares the same interest of improving the convergence of
 observability and security in this space. We believe this schema merge brings
-huge value to the open-source community because:
+huge value to the open source community because:
 
 - ECS has years of proven success in the logs, metrics, traces and security
   events schema, providing great coverage of the common problem domains.

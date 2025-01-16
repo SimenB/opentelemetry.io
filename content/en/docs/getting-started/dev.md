@@ -13,28 +13,27 @@ OpenTelemetry can help you! To accomplish your goals of having your dependencies
 instrumented automatically and instrumenting your own code with our API
 manually, we recommend that you learn the following concepts first:
 
-- [What is OpenTelemetry?](/docs/what-is-opentelemetry/)
-- [How can I instrument dependencies without touching their code?](/docs/concepts/instrumenting/#automatic-instrumentation)
-- [How can I instrument my application manually?](/docs/concepts/instrumenting/#manual-instrumentation)
+- [What is OpenTelemetry?](../../what-is-opentelemetry/)
+- [How can I add instrumentation to my code base?](../../concepts/instrumentation/code-based/)
 
 If you develop libraries, frameworks or middleware that is used as a dependency
 within other software, we recommend that you learn how you can provide telemetry
 natively:
 
-- [How can I add native instrumentation to my library?](/docs/concepts/instrumenting-library/)
+- [How can I add native instrumentation to my library?](../../concepts/instrumentation/libraries/)
 
 Next, you can deep dive into the documentations for the
-[language](/docs/instrumentation/) you are using:
+[language](../../languages/) you are using:
 
-- [C++](/docs/instrumentation/cpp/)
-- [.NET](/docs/instrumentation/net/)
-- [Erlang / Elixir](/docs/instrumentation/erlang/)
-- [Go](/docs/instrumentation/go/)
-- [Java](/docs/instrumentation/java/)
-- [JavaScript / TypeScript](/docs/instrumentation/js/)
-- [PHP](/docs/instrumentation/php/)
-- [Python](/docs/instrumentation/python/)
-- [Ruby](/docs/instrumentation/ruby/)
-- [Rust](/docs/instrumentation/rust/)
-- [Swift](/docs/instrumentation/swift/)
-- [Other](/docs/instrumentation/other/)
+- [C++](../../languages/cpp/)
+- [.NET](../../languages/net/)
+- [Erlang / Elixir](../../languages/erlang/)
+- [Go](../../languages/go/)
+- [Java](../../languages/java/)
+- [JavaScript / TypeScript](../../languages/js/)
+- [PHP](../../languages/php/)
+- [Python](../../languages/python/)
+- [Ruby](../../languages/ruby/)
+- [Rust](../../languages/rust/)
+- [Swift](../../languages/swift/)
+- [Other](../../languages/other/)

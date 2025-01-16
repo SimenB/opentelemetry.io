@@ -3,6 +3,7 @@ title: Instrumenting Apache Kafka clients with OpenTelemetry
 linkTitle: Instrumenting Apache Kafka clients
 date: 2022-09-06
 author: '[Paolo Patierno](https://github.com/ppatierno)'
+cSpell:ignore: Paolo Patierno
 ---
 
 Nowadays, [Apache Kafka](https://kafka.apache.org/) is chosen as the nervous
@@ -22,7 +23,7 @@ difficult to track how messages are moved around. This is where OpenTelemetry
 comes into the picture. It provides multiple instrumentation libraries for
 adding tracing to messaging based applications. Of course, there is one for
 Apache Kafka clients. It also defines the specification of semantic conventions
-for [messaging systems](/docs/specs/otel/trace/semantic_conventions/messaging/).
+for [messaging systems](/docs/specs/semconv/messaging/messaging-spans/).
 
 But usually, the architecture can even be more complicated: having applications
 not able to connect directly to the Apache Kafka cluster and talking its own
@@ -89,7 +90,7 @@ java -javaagent:path/to/opentelemetry-javaagent.jar \
       -jar kafka-consumer-agent/target/kafka-consumer-agent-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-The agent leverages the auto-configuration SDK extension, you will see in a bit,
+The agent leverages the autoconfiguration SDK extension, you will see in a bit,
 by setting the main parameters through system properties.
 
 ## Instrumenting the Apache Kafka clients
@@ -127,14 +128,14 @@ available to the Kafka clients instrumentation library.
 
 This can be done in two different ways:
 
-- using an SDK extension for environment-based auto-configuration.
+- using an SDK extension for environment-based autoconfiguration.
 - using SDK builders classes for programmatic configuration.
 
-#### Using the SDK auto-configuration
+#### Using the SDK autoconfiguration
 
 It is possible to configure a global `OpenTelemetry` instance by using
-environment variables thanks to the SDK extension for auto-configuration,
-enabled by adding the following dependency to your application.
+environment variables thanks to the SDK extension for autoconfiguration, enabled
+by adding the following dependency to your application.
 
 ```xml
 <dependency>
@@ -145,7 +146,7 @@ enabled by adding the following dependency to your application.
 
 When the Kafka clients instrumentation library is used, it checks if there is an
 `OpenTelemetry` instance already created and registered. If it is not, the
-library code checks if the SDK auto-configure module is in the classpath and in
+library code checks if the SDK autoconfigure module is in the classpath and in
 this case initializes it for creating the `OpenTelemetry` instance
 automatically. The corresponding configuration happens through environment
 variables (or corresponding system properties). This is really a way to simplify
@@ -168,7 +169,7 @@ command line when launching the application They are `otel.service.name` and
 #### Using the SDK builders
 
 In order to build your own `OpenTelemetry` instance and not relying on the
-auto-configuration, it is possible to do so by using the SDK builders classes
+autoconfiguration, it is possible to do so by using the SDK builders classes
 programmatically. The OpenTelemetry SDK dependency is needed in order to have
 such SDK builders available in your code.
 
