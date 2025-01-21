@@ -1,36 +1,14 @@
 # Netlify redirects. See https://www.netlify.com/docs/redirects/
-{{/* cSpell:ignore wordmark */ -}}
+{{ partial "redirects/pages.txt" . | partial "func/trim-lines.html" -}}
+{{ partial "redirects/languages.txt" . | partial "func/trim-lines.html" -}}
 
-{{ range $p := .Site.Pages -}}
-
-{{ range $p.Aliases -}}
-  {{ . | printf "%-35s" }} {{ $p.RelPermalink }}
-{{ end -}}
-
-{{ with $p.Params.redirect -}}
-  {{ $p.RelPermalink | printf "%-35s" }} {{ . }}
-{{ end -}}
-
-{{ end }}{{/* range $p */ -}}
-
-{{ $languages := (.Site.GetPage "/docs/instrumentation").Pages -}}
-{{ range $languages -}}
-{{ $lang := .File.ContentBaseName -}}
-{{ if ne $lang "other" -}}
-/docs/{{ $lang }}   /docs/instrumentation/{{ $lang }}
-/docs/{{ $lang }}/*  /docs/instrumentation/{{ $lang }}/:splat
-{{ end -}}
-{{ end -}}
-
+{{/* TODO: move the following into the spec index file. */ -}}
 /docs/reference/specification    /docs/specs/otel
 /docs/reference/specification/*  /docs/specs/otel/:splat
+/docs/specification/otel/*       /docs/specs/otel/:splat
 
-{{/*
-  Social-media image redirects. As mentioned in
-  https://developers.facebook.com/docs/sharing/webmasters/images, we need to
-  preserve og:image (and other social media image) URLs forever.
-*/ -}}
+{{ partial "redirects/schemas.txt" . }}
 
-{{ $og_image_current := `/img/social/logo-wordmark-001.png` -}}
+{{ partial "redirects/social-media.txt" . }}
 
-/featured-background.jpg  {{ $og_image_current }} {{/* homepage og:image used prior to 2022/08 */}}
+{{ partial "redirects/localization.txt" . | partial "func/trim-lines.html" }}

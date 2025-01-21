@@ -1,0 +1,6 @@
+desserializa
+desserializar
+autoinstrumentação
+autoconsistentes
+serialização
+verbosidade

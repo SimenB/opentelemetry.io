@@ -1,49 +1,71 @@
 ---
 title: Integrations
-description: OpenTelemetry integrations with other open-source projects
+description:
+  Libraries, services, and apps with first-party support for OpenTelemetry.
 aliases: [/integrations]
-spelling: cSpell:ignore containerd buildx quarkus
 ---
 
-OpenTelemetry integrates with or is integrated into various open source
-projects.
+The mission of OpenTelemetry is
+[to enable effective observability by making high-quality, portable telemetry ubiquitous](/community/mission/).
+In other words, observability should be built in into the software you develop.
 
-## Within OpenTelemetry
+While external instrumentation through
+[zero code instrumentation solutions](/docs/concepts/instrumentation/zero-code)
+and
+[instrumentation libraries](/docs/specs/otel/overview/#instrumentation-libraries)
+provide a convenient way to make your application observable, we believe that
+ultimately all applications should either integrate the OpenTelemetry APIs and
+SDKs directly for native telemetry, or provide a first-party plugin that fits
+into the ecosystem of the given software.
 
-OpenTelemetry provides integration with the following open source projects.
+This page contains a sample of libraries, services, and apps providing native
+instrumentation or first class plugins.
 
-| External Project\*                                        | OpenTelemetry Supported Components                       |
-| --------------------------------------------------------- | -------------------------------------------------------- |
-| [Apache Kafka](https://kafka.apache.org/)                 | Collector                                                |
-| [Apache SkyWalking](https://skywalking.apache.org)        | Collector                                                |
-| [Elasticsearch](https://github.com/elastic/elasticsearch) | Collector, C++, Java, Python                             |
-| [Fluent Bit](https://fluentbit.io/)                       | Collector                                                |
-| [Graphite](https://graphiteapp.org/)                      | Collector                                                |
-| [Jaeger](https://www.jaegertracing.io/)                   | Collector, DotNet, Go, Java, JS, PHP, Python, Ruby, Rust |
-| [OpenCensus](https://opencensus.io/)                      | Collector, Python                                        |
-| [OpenTracing](https://opentracing.io/)                    | DotNet, Go, Java, JS, Python, Ruby                       |
-| [OpenMetrics](https://openmetrics.io/) [^partial-support] | Collector                                                |
-| [Prometheus](https://prometheus.io/) [^partial-support]   | Collector, C++, Go, Java, JS, Rust                       |
-| [Zipkin](https://zipkin.io/)                              | Collector, DotNet, Go, Java, JS, PHP, Python, Rust       |
-| [W3C trace-context](https://www.w3.org/TR/trace-context/) | DotNet, Go, Java, JS, Python, Ruby                       |
+## Libraries
 
-\* _Projects are listed alphabetically_.
+Native library instrumentation with OpenTelemetry provides better observability
+and developer experience for users, removing the need for libraries to expose
+and document hooks. Below you will find a list of libraries that use the
+OpenTelemetry API to provide out of the box observability.
 
-## Outside OpenTelemetry
+{{% ecosystem/integrations-table "native libraries" %}}
 
-The following open source projects use OpenTelemetry components.
+## Applications and Services
 
-| External Project                                                                           | Applicable OpenTelemetry Components |
-| ------------------------------------------------------------------------------------------ | ----------------------------------- |
-| [containerd](https://github.com/containerd/containerd/blob/main/docs/tracing.md)           | Go                                  |
-| [CRI-O](https://github.com/cri-o/cri-o/blob/main/docs/crio.conf.5.md#criotracing-table)    | Go                                  |
-| [Docker buildx](https://github.com/docker/buildx/blob/master/docs/guides/opentelemetry.md) | Go                                  |
-| [Jaeger](https://www.jaegertracing.io/)                                                    | Collector, Go                       |
-| [Kubernetes](https://kubernetes.io/docs/concepts/cluster-administration/system-traces/)    | Go                                  |
-| [Micrometer](https://micrometer.io/docs/tracing#_micrometer_tracing_opentelemetry_setup)   | Java                                |
-| [Quarkus](https://quarkus.io/guides/opentelemetry)                                         | Java                                |
+The following list contains a sample of libraries, services, and apps that have
+either integrated OpenTelemetry APIs and SDKs directly for native telemetry or
+provide a first-party plugin that fits into their own extensibility ecosystem.
 
-\* _Projects are listed alphabetically_.
+Open source projects (OSS) are at the beginning of the list, and commercial
+projects follow. Projects which are part of the [CNCF](https://www.cncf.io/)
+have a CNCF logo beside their name.
 
-[^partial-support]:
-    Projects only partially supported at this time. Full support coming soon!
+{{% ecosystem/integrations-table "application integrations" %}}
+
+## Adding your integration {#how-to-add}
+
+To have your library, service, or app listed, [submit a PR] with an entry added
+to the [registry](/ecosystem/registry/adding). The entry should include the
+following:
+
+- Link to the main page of your library, service, or app
+- Link to the documentation that explains how enable observability using
+  OpenTelemetry
+
+{{% alert title="Note" color="info" %}}
+
+If you provide external integration of OpenTelemetry for any kind of library,
+service, or app, then
+[consider adding it to the registry](/ecosystem/registry/adding).
+
+If you adopt OpenTelemetry for Observability as an end user and do not provide
+any kind of services around OpenTelemetry, see [Adopters](/ecosystem/adopters).
+
+If you provide a solution that consumes OpenTelemetry to offer observability to
+end users, see [Vendors](/ecosystem/vendors).
+
+{{% /alert %}}
+
+[submit a PR]: /docs/contributing/pull-requests/
+
+{{% ecosystem/keep-up-to-date integration %}}

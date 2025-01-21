@@ -17,7 +17,7 @@ finally archived.
 
 We intend to **deprecate Jaeger exporters from OpenTelemetry** in the near
 future, and are looking for your feedback to determine the length of the
-depreation phase. The best way to provide feedback is by
+deprecation phase. The best way to provide feedback is by
 [filling out a 4-question survey](https://forms.gle/aUuJg5DQwNzncJ4s8) or
 commenting on
 [the existing draft pull request](https://github.com/open-telemetry/opentelemetry-specification/pull/2858).
@@ -31,27 +31,27 @@ languages.
 
 This causes challenges for both Jaeger users and OpenTelemetry maintainers:
 
-1.  **Confusing Choices**
+1. **Confusing Choices**
 
-    Currently, users are faced with a choice of exporter (Jaeger or OTLP), and
-    this can be a source of confusion. A user might be inclined, when exporting
-    telemetry to Jaeger, to simply choose the Jaeger exporter because the name
-    matches (even though Jaeger now actively encourages the use of OTLP).
+   Currently, users are faced with a choice of exporter (Jaeger or OTLP), and
+   this can be a source of confusion. A user might be inclined, when exporting
+   telemetry to Jaeger, to simply choose the Jaeger exporter because the name
+   matches (even though Jaeger now actively encourages the use of OTLP).
 
-    If we can eliminate this potentially confusing choice, we can improve the
-    user experience and continue standardizing on a single interoperable
-    protocol. We love it when things "just work" out of the box!
+   If we can eliminate this potentially confusing choice, we can improve the
+   user experience and continue standardizing on a single interoperable
+   protocol. We love it when things "just work" out of the box!
 
-2.  **Maintenance and duplication**
+2. **Maintenance and duplication**
 
-    Because the Jaeger client libraries are now archived, they will not receive
-    updates (including security patches). To continue properly supporting Jaeger
-    client exporters, OpenTelemetry authors would be required to re-implement
-    some of the functionality it had previously leveraged from the Jaeger
-    clients.
+   Because the Jaeger client libraries are now archived, they will not receive
+   updates (including security patches). To continue properly supporting Jaeger
+   client exporters, OpenTelemetry authors would be required to re-implement
+   some of the functionality it had previously leveraged from the Jaeger
+   clients.
 
-    Now that Jaeger supports OTLP, this feels like a step backwards: It results
-    in an increased maintenance burden with very little benefit.
+   Now that Jaeger supports OTLP, this feels like a step backwards: It results
+   in an increased maintenance burden with very little benefit.
 
 ### User Impact
 
@@ -59,7 +59,7 @@ The proposal is to deprecate the following exporters from OpenTelemetry in favor
 of using native OTLP into Jaeger:
 
 - Jaeger Thrift over HTTP
-- Jaeger Protobuf via gRPC
+- Jaeger protobuf via gRPC
 - Jaeger Thrift over UDP
 
 In addition to application configuration changes, there could be other
@@ -68,14 +68,14 @@ replacements, although it may require exposing ports 4317 and 4318 if they are
 not already accessible.
 
 Thrift over UDP implies the use of the
-[Jaeger Agent](https://www.jaegertracing.io/docs/1.24/architecture/#agent).
+[Jaeger agent](https://www.jaegertracing.io/docs/1.24/architecture/#agent).
 Users with this deployment configuration will need to make a slightly more
 complicated change, typically one of the following:
 
 1. Direct ingest. Applications will change from using Thrift+UDP to sending OTLP
    traces directly to their `jaeger-collector` instance. This may also have
    sampling implications.
-2. Replacing the Jaeger Agent with a sidecar
+2. Replacing the Jaeger agent with a sidecar
    [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector)
    instance. This could have sampling implications and requires changes to your
    infrastructure deployment code.
