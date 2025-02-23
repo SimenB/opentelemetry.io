@@ -1,5 +1,6 @@
 ---
 title: Frontend
+cSpell:ignore: typeof
 ---
 
 The frontend is responsible to provide a UI for users, as well as an API
@@ -10,14 +11,14 @@ leveraged by the UI or other clients. The application is based on
 
 ## Server Instrumentation
 
-It is recommended to use a Node required module when starting your NodeJS
+It is recommended to use a Node required module when starting your Node.js
 application to initialize the SDK and auto-instrumentation. When initializing
-the OpenTelemetry NodeJS SDK, you optionally specify which auto-instrumentation
+the OpenTelemetry Node.js SDK, you optionally specify which auto-instrumentation
 libraries to leverage, or make use of the `getNodeAutoInstrumentations()`
 function which includes most popular frameworks. The
 `utils/telemetry/Instrumentation.js` file contains all code required to
 initialize the SDK and auto-instrumentation based on standard
-[OpenTelemetry environment variables](/docs/specs/otel/sdk-environment-variables/)
+[OpenTelemetry environment variables](/docs/specs/otel/configuration/sdk-environment-variables/)
 for OTLP export, resource attributes, and service name.
 
 ```javascript
@@ -84,9 +85,9 @@ This can be done in the `scripts.start` section of `package.json` and starting
 the application using `npm start`.
 
 ```json
-  "scripts": {
-    "start": "node --require ./Instrumentation.js server.js",
-  },
+"scripts": {
+  "start": "node --require ./Instrumentation.js server.js",
+},
 ```
 
 ## Traces
@@ -123,12 +124,12 @@ span = tracer.startSpan(`HTTP ${method}`, {
   links: [{ context: syntheticSpan.spanContext() }],
   attributes: {
     'app.synthetic_request': true,
-    [SemanticAttributes.HTTP_TARGET]: target,
-    [SemanticAttributes.HTTP_STATUS_CODE]: response.statusCode,
-    [SemanticAttributes.HTTP_METHOD]: method,
-    [SemanticAttributes.HTTP_USER_AGENT]: headers['user-agent'] || '',
-    [SemanticAttributes.HTTP_URL]: `${headers.host}${url}`,
-    [SemanticAttributes.HTTP_FLAVOR]: httpVersion,
+    [SEMATTRS_HTTP_TARGET]: target,
+    [SEMATTRS_HTTP_STATUS_CODE]: response.statusCode,
+    [SEMATTRS_HTTP_METHOD]: method,
+    [SEMATTRS_HTTP_USER_AGENT]: headers['user-agent'] || '',
+    [SEMATTRS_HTTP_URL]: `${headers.host}${url}`,
+    [SEMATTRS_HTTP_FLAVOR]: httpVersion,
   },
 });
 ```
@@ -145,10 +146,10 @@ import FrontendTracer from '../utils/telemetry/FrontendTracer';
 if (typeof window !== 'undefined') FrontendTracer();
 ```
 
-The `utils/telemetry/FrontendTracer.ts` file contains code to intialize a
+The `utils/telemetry/FrontendTracer.ts` file contains code to initialize a
 TracerProvider, establish an OTLP export, register trace context propagators,
 and register web specific auto-instrumentation libraries. Since the browser will
-send data to an OpenTelemetry collector that will likely be on a separate
+send data to an OpenTelemetry Collector that will likely be on a separate
 domain, CORS headers are also setup accordingly.
 
 As part of the changes to carry over the `synthetic_request` attribute flag for
@@ -167,7 +168,7 @@ import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { getWebAutoInstrumentations } from '@opentelemetry/auto-instrumentations-web';
 import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const FrontendTracer = async () => {
@@ -175,8 +176,7 @@ const FrontendTracer = async () => {
 
   const provider = new WebTracerProvider({
     resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]:
-        process.env.NEXT_PUBLIC_OTEL_SERVICE_NAME,
+      [SEMRESATTRS_SERVICE_NAME]: process.env.NEXT_PUBLIC_OTEL_SERVICE_NAME,
     }),
   });
 
@@ -232,6 +232,6 @@ To determine if a Baggage item is set, you can leverage the `propagation` API to
 parse the Baggage header, and leverage the `baggage` API to get or set entries.
 
 ```typescript
-    const baggage = propagation.getBaggage(context.active());
-    if (baggage?.getEntry("synthetic_request")?.value == "true") {...}
+const baggage = propagation.getBaggage(context.active());
+if (baggage?.getEntry("synthetic_request")?.value == "true") {...}
 ```

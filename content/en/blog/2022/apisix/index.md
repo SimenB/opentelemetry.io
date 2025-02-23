@@ -4,7 +4,7 @@ linkTitle: Apache APISIX-Opentelemetry Integration
 date: 2022-03-26
 author: '[Haochao Zhuang](https://github.com/dmsolr), Fei Han'
 canonical_url: https://apisix.apache.org/blog/2022/02/28/apisix-integration-opentelemetry-plugin/
-spelling: cSpell:ignore APISIX
+cSpell:ignore: APISIX Haochao httpbin pprof roundrobin Zhuang zpages
 ---
 
 This article introduces the Apache APISIX's `opentelemetry` plugin concept and
@@ -28,14 +28,14 @@ The `opentelemetry` plugin of Apache APISIX implements Tracing data collection
 and sends it to OpenTelemetry Collector through HTTP protocol. Apache APISIX
 starts to support this feature in v2.13.0.
 
-One of OpenTelemetry's special features is that the Agent/SDK of OpenTelemetry
-is not locked with back-end implementation, which gives users flexibilities on
-choosing their own back-end services. In other words, users can choose the
+One of OpenTelemetry's special features is that the agent/SDK of OpenTelemetry
+is not locked with backend implementation, which gives users flexibilities on
+choosing their own backend services. In other words, users can choose the
 backend services they want, such as Zipkin and Jaeger, without affecting the
 application side.
 
-The `opentelemetry` plugin is located on the Agent side. It integrates the
-OpenTelemetry Agent/SDK and adopts its features in Apache APISIX. It can collect
+The `opentelemetry` plugin is located on the agent side. It integrates the
+OpenTelemetry agent/SDK and adopts its features in Apache APISIX. It can collect
 traced requests, generate `trace`, and forward them to the OpenTelemetry
 Collector. It supports the `trace` protocol, and it will support the `logs` and
 `metrics` protocols of OpenTelemetry in the next version.
@@ -60,7 +60,7 @@ related fields, see the
 A typical configuration might look like this:
 
 ```yaml
-plugins
+plugins:
   ... # Other plugins that have been enabled
   - opentelemetry
 plugin_attr:
@@ -175,8 +175,8 @@ displayed in the Tags list: `http_x-custom-ot-key` and `route_id`.
 ![Jaeger UI](jaeger-ui-1.png)
 
 You need to note that the `additional_attributes` configuration is set to take
-values from Apache APISIX and Nginx variables as `attribute` values, so
-`additional_attributes` must be a valid Apache APISIX or Nginx variable. It also
+values from Apache APISIX and NGINX variables as `attribute` values, so
+`additional_attributes` must be a valid Apache APISIX or NGINX variable. It also
 includes HTTP Header, but when fetching http*header, you need to add
 `http*`as the prefix of the variable name. If the variable does not exist, the`tag`
 will not be displayed.
@@ -191,15 +191,15 @@ resulting in a call chain consisting of two spans.
 
 ### Step 1: Deploy OpenTelemetry
 
-The following uses docker-compose as an example. For other deployments, see
-[Getting Started](/docs/collector/getting-started/).
+The following uses `docker compose` as an example. For other deployments, see
+[Quick start](/docs/collector/quick-start/).
 
-You can see the following command to deploy:
+You can see the following command to deploy[^1]:
 
 ```shell
 git clone https://github.com/open-telemetry/opentelemetry-collector-contrib.git
 cd opentelemetry-collector-contrib/examples/demo
-docker-compose up -d
+docker compose up -d
 ```
 
 Visit <http://127.0.0.1:16886> (Jaeger UI) or <http://127.0.0.1:9411/zipkin>
@@ -393,4 +393,6 @@ communicate via the
 
 _A version of this article was [originally posted][] on the Apache APISIX blog._
 
-[originally posted]: {{% param canonical_url %}}
+[^1]: {{% param notes.docker-compose-v2 %}}
+
+[originally posted]: <{{% param canonical_url %}}>

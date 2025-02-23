@@ -2,11 +2,9 @@
 title: Join us for OpenTelemetry Talks and Activities at KubeCon EU 2023
 linkTitle: KubeCon EU '23
 date: 2023-04-03
-spelling:
-  cSpell:ignore Severin Neumann Pavol Loffay Kowall Aiven Vider Xiaochun
-  cSpell:ignore Alolita Sharma Dyla Benedikt Bongartz Oliveira Pathak
-  cSpell:ignore Jaglowski observ
 author: '[Severin Neumann](https://github.com/svrnm)'
+# prettier-ignore
+cSpell:ignore: Aiven Benedikt Bongartz Jaglowski Kowall observ Oliveira Pathak Vider Xiaochun
 ---
 
 The OpenTelemetry project maintainers, members of the governance committee, and
@@ -44,7 +42,7 @@ Come network with OpenTelemetry maintainers and core contributors during the
 2023 from 16:00 - 17:00. You can attend with a _standard in-person pass_.
 
 [Observability Day][] _fosters collaboration, discussion, and knowledge sharing
-of cloud-native observability projects_. This event will be held on April 18,
+of cloud native observability projects_. This event will be held on April 18,
 2023 from 9:00 - 17:00. There will be several sessions on OpenTelemetry as well.
 
 > <i class="far fa-exclamation-triangle"></i> **IMPORTANT access note**: You

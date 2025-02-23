@@ -1,6 +1,9 @@
 ---
 title: Development
+cSpell:ignore: grpcio intellij libcurl libprotobuf nlohmann openssl protoc
 ---
+
+[OpenTelemetry Demo GitHub repository](https://github.com/open-telemetry/opentelemetry-demo)
 
 Development for this demo requires tooling in several programming languages.
 Minimum required versions will be noted where possible, but it is recommended to
@@ -8,7 +11,7 @@ update to the latest version for all tooling. The OpenTelemetry demo team will
 attempt to keep the services in this repository up to date with the latest
 version for dependencies and tooling when possible.
 
-## Generate Protobuf files
+## Generate protobuf files
 
 The `make generate-protobuf` command is provided to generate protobuf files for
 all services. This can be used to compile code locally (without Docker) and
@@ -19,7 +22,7 @@ receive hints from IDEs such as IntelliJ or VS Code. It may be necessary to run
 
 ### .NET
 
-- .NET 6.0+
+- .NET 8.0+
 
 ### C++
 
@@ -30,12 +33,6 @@ receive hints from IDEs such as IntelliJ or VS Code. It may be necessary to run
 - nlohmann-json3-dev
 - pkg-config
 - protobuf-compiler
-
-### Elixir
-
-- Erlang/OTP 23+
-- Elixir 1.13+
-- Rebar3 3.20+
 
 ### Go
 

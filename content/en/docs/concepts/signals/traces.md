@@ -1,111 +1,138 @@
 ---
 title: Traces
 weight: 1
+description: The path of a request through your application.
+cSpell:ignore: Guten
 ---
 
-[**Traces**](/docs/concepts/observability-primer/#distributed-traces) give us
-the big picture of what happens when a request is made to an application.
-Whether your application is a monolith with a single database or a sophisticated
-mesh of services, traces are essential to understanding the full "path" a
-request takes in your application.
+**Traces** give us the big picture of what happens when a request is made to an
+application. Whether your application is a monolith with a single database or a
+sophisticated mesh of services, traces are essential to understanding the full
+"path" a request takes in your application.
 
-Consider the following example trace that tracks three units of work:
+Let's explore this with three units of work, represented as [Spans](#spans):
+
+{{% alert title="Note" %}}
+
+The following JSON examples do not represent a specific format, and especially
+not [OTLP/JSON](/docs/specs/otlp/#json-protobuf-encoding), which is more
+verbose.
+
+{{% /alert %}}
+
+`hello` span:
 
 ```json
 {
-    "name": "Hello-Greetings",
-    "context": {
-        "trace_id": "0x5b8aa5a2d2c872e8321cf37308d69df2",
-        "span_id": "0x5fb397be34d26b51",
-    },
-    "parent_id": "0x051581bf3cb55c13",
-    "start_time": "2022-04-29T18:52:58.114304Z",
-    "end_time": "2022-04-29T22:52:58.114561Z",
-    "attributes": {
-        "http.route": "some_route1"
-    },
-    "events": [
-        {
-            "name": "hey there!",
-            "timestamp": "2022-04-29T18:52:58.114561Z",
-            "attributes": {
-                "event_attributes": 1
-            }
-        },
-        {
-            "name": "bye now!",
-            "timestamp": "2022-04-29T18:52:58.114585Z",
-            "attributes": {
-                "event_attributes": 1
-            }
-        }
-    ],
-}
-{
-    "name": "Hello-Salutations",
-    "context": {
-        "trace_id": "0x5b8aa5a2d2c872e8321cf37308d69df2",
-        "span_id": "0x93564f51e1abe1c2",
-    },
-    "parent_id": "0x051581bf3cb55c13",
-    "start_time": "2022-04-29T18:52:58.114492Z",
-    "end_time": "2022-04-29T18:52:58.114631Z",
-    "attributes": {
-        "http.route": "some_route2"
-    },
-    "events": [
-        {
-            "name": "hey there!",
-            "timestamp": "2022-04-29T18:52:58.114561Z",
-            "attributes": {
-                "event_attributes": 1
-            }
-        }
-    ],
-}
-{
-    "name": "Hello",
-    "context": {
-        "trace_id": "0x5b8aa5a2d2c872e8321cf37308d69df2",
-        "span_id": "0x051581bf3cb55c13",
-    },
-    "parent_id": null,
-    "start_time": "2022-04-29T18:52:58.114201Z",
-    "end_time": "2022-04-29T18:52:58.114687Z",
-    "attributes": {
-        "http.route": "some_route3"
-    },
-    "events": [
-        {
-            "name": "Guten Tag!",
-            "timestamp": "2022-04-29T18:52:58.114561Z",
-            "attributes": {
-                "event_attributes": 1
-            }
-        }
-    ],
+  "name": "hello",
+  "context": {
+    "trace_id": "5b8aa5a2d2c872e8321cf37308d69df2",
+    "span_id": "051581bf3cb55c13"
+  },
+  "parent_id": null,
+  "start_time": "2022-04-29T18:52:58.114201Z",
+  "end_time": "2022-04-29T18:52:58.114687Z",
+  "attributes": {
+    "http.route": "some_route1"
+  },
+  "events": [
+    {
+      "name": "Guten Tag!",
+      "timestamp": "2022-04-29T18:52:58.114561Z",
+      "attributes": {
+        "event_attributes": 1
+      }
+    }
+  ]
 }
 ```
 
-This sample trace output has three distinct log-like items, called
-[Spans](#spans), named `Hello-Greetings`, `Hello-Salutations` and `Hello`.
-Because each request's context has the same `trace_id`, they are considered to
-be a part of the same Trace.
+This is the root span, denoting the beginning and end of the entire operation.
+Note that it has a `trace_id` field indicating the trace, but has no
+`parent_id`. That's how you know it's the root span.
 
-Another thing you'll note is that each Span of this example Trace looks like a
-structured log. That's because it kind of is! One way to think of Traces is that
-they're a collection of structured logs with context, correlation, hierarchy,
-and more baked in. However, these "structured logs" can come from different
-processes, services, VMs, data centers, and so on. This is what allows tracing
-to represent an end-to-end view of any system.
+`hello-greetings` span:
+
+```json
+{
+  "name": "hello-greetings",
+  "context": {
+    "trace_id": "5b8aa5a2d2c872e8321cf37308d69df2",
+    "span_id": "5fb397be34d26b51"
+  },
+  "parent_id": "051581bf3cb55c13",
+  "start_time": "2022-04-29T18:52:58.114304Z",
+  "end_time": "2022-04-29T22:52:58.114561Z",
+  "attributes": {
+    "http.route": "some_route2"
+  },
+  "events": [
+    {
+      "name": "hey there!",
+      "timestamp": "2022-04-29T18:52:58.114561Z",
+      "attributes": {
+        "event_attributes": 1
+      }
+    },
+    {
+      "name": "bye now!",
+      "timestamp": "2022-04-29T18:52:58.114585Z",
+      "attributes": {
+        "event_attributes": 1
+      }
+    }
+  ]
+}
+```
+
+This span encapsulates specific tasks, like saying greetings, and its parent is
+the `hello` span. Note that it shares the same `trace_id` as the root span,
+indicating it's a part of the same trace. Additionally, it has a `parent_id`
+that matches the `span_id` of the `hello` span.
+
+`hello-salutations` span:
+
+```json
+{
+  "name": "hello-salutations",
+  "context": {
+    "trace_id": "5b8aa5a2d2c872e8321cf37308d69df2",
+    "span_id": "93564f51e1abe1c2"
+  },
+  "parent_id": "051581bf3cb55c13",
+  "start_time": "2022-04-29T18:52:58.114492Z",
+  "end_time": "2022-04-29T18:52:58.114631Z",
+  "attributes": {
+    "http.route": "some_route3"
+  },
+  "events": [
+    {
+      "name": "hey there!",
+      "timestamp": "2022-04-29T18:52:58.114561Z",
+      "attributes": {
+        "event_attributes": 1
+      }
+    }
+  ]
+}
+```
+
+This span represents the third operation in this trace and, like the previous
+one, it's a child of the `hello` span. That also makes it a sibling of the
+`hello-greetings` span.
+
+These three blocks of JSON all share the same `trace_id`, and the `parent_id`
+field represents a hierarchy. That makes it a Trace!
+
+Another thing you'll note is that each Span looks like a structured log. That's
+because it kind of is! One way to think of Traces is that they're a collection
+of structured logs with context, correlation, hierarchy, and more baked in.
+However, these "structured logs" can come from different processes, services,
+VMs, data centers, and so on. This is what allows tracing to represent an
+end-to-end view of any system.
 
 To understand how tracing in OpenTelemetry works, let's look at a list of
-components that will play a part in instrumenting our code:
-
-- Tracer
-- Tracer Provider
-- Trace Exporter
-- Trace Context
+components that will play a part in instrumenting our code.
 
 ## Tracer Provider
 
@@ -132,38 +159,13 @@ source or vendor backend of your choice.
 
 Context Propagation is the core concept that enables Distributed Tracing. With
 Context Propagation, Spans can be correlated with each other and assembled into
-a trace, regardless of where Spans are generated. We define Context Propagation
-by two sub-concepts: Context and Propagation.
-
-A **Context** is an object that contains the information for the sending and
-receiving service to correlate one span with another and associate it with the
-trace overall. For example, if Service A calls Service B, then a span from
-Service A whose ID is in context will be used as the parent span for the next
-span created in Service B.
-
-**Propagation** is the mechanism that moves Context between services and
-processes. By doing so, it assembles a Distributed Trace. It serializes or
-deserializes Span Context and provides the relevant Trace information to be
-propagated from one service to another. We now have what we call: **Trace
-Context**.
-
-Context is an abstract concept - it requires a concrete implementation to
-actually be useful. OpenTelemetry supports several different Context formats.
-The default format used in OpenTelemetry tracing is W3C `TraceContext`. Each
-Context object is associated with a span and can be accessed specification on
-spans. See [Span Context](#span-context).
-
-By combining Context and Propagation, you now can assemble a Trace.
-
-> For more information, see the [traces specification][]
-
-[traces specification]: /docs/specs/otel/overview/#tracing-signal
+a trace, regardless of where Spans are generated. To learn more about this
+topic, see the concept page on [Context Propagation](../../context-propagation).
 
 ## Spans
 
-A [**span**](/docs/concepts/observability-primer/#spans) represents a unit of
-work or operation. Spans are the building blocks of Traces. In OpenTelemetry,
-they include the following information:
+A **span** represents a unit of work or operation. Spans are the building blocks
+of Traces. In OpenTelemetry, they include the following information:
 
 - Name
 - Parent span ID (empty for root spans)
@@ -178,10 +180,12 @@ Sample span:
 
 ```json
 {
-  "trace_id": "7bba9f33312b3dbb8b2c2c62bb7abe2d",
-  "parent_id": "",
-  "span_id": "086e83747d0e381e",
   "name": "/v1/sys/health",
+  "context": {
+    "trace_id": "7bba9f33312b3dbb8b2c2c62bb7abe2d",
+    "span_id": "086e83747d0e381e"
+  },
+  "parent_id": "",
   "start_time": "2021-10-22 16:04:01.209458162 +0000 UTC",
   "end_time": "2021-10-22 16:04:01.209514132 +0000 UTC",
   "status_code": "STATUS_CODE_OK",
@@ -226,8 +230,7 @@ Span context is an immutable object on every span that contains the following:
   information
 
 Span context is the part of a span that is serialized and propagated alongside
-[Distributed Context](#context-propagation) and
-[Baggage](/docs/concepts/signals/baggage).
+[Distributed Context](#context-propagation) and [Baggage](../baggage).
 
 Because Span Context contains the Trace ID, it is used when creating
 [Span Links](#span-links).
@@ -241,6 +244,10 @@ For example, if a span tracks an operation that adds an item to a user's
 shopping cart in an eCommerce system, you can capture the user's ID, the ID of
 the item to add to the cart, and the cart ID.
 
+You can add attributes to spans during or after span creation. Prefer adding
+attributes at span creation to make the attributes available to SDK sampling. If
+you have to add a value after span creation, update the span with the value.
+
 Attributes have the following rules that each language SDK implements:
 
 - Keys must be non-null string values
@@ -248,10 +255,10 @@ Attributes have the following rules that each language SDK implements:
   an array of these values
 
 Additionally, there are
-[Semantic Attributes](/docs/specs/otel/trace/semantic_conventions/), which are
-known naming conventions for metadata that is typically present in common
-operations. It's helpful to use semantic attribute naming wherever possible so
-that common kinds of metadata are standardized across systems.
+[Semantic Attributes](/docs/specs/semconv/general/trace/), which are known
+naming conventions for metadata that is typically present in common operations.
+It's helpful to use semantic attribute naming wherever possible so that common
+kinds of metadata are standardized across systems.
 
 ### Span Events
 
@@ -269,6 +276,19 @@ and an end.
 
 A Span Event is best used to track the second scenario because it represents a
 meaningful, singular point in time.
+
+#### When to use span events versus span attributes
+
+Since span events also contain attributes, the question of when to use events
+instead of attributes might not always have an obvious answer. To inform your
+decision, consider whether a specific timestamp is meaningful.
+
+For example, when you're tracking an operation with a span and the operation
+completes, you might want to add data from the operation to your telemetry.
+
+- If the timestamp in which the operation completes is meaningful or relevant,
+  attach the data to a span event.
+- If the timestamp isn't meaningful, attach the data as span attributes.
 
 ### Span Links
 
@@ -290,19 +310,36 @@ trace. Now, they are causally associated with one another.
 Links are optional but serve as a good way to associate trace spans with one
 another.
 
+For more information regarding Span Links, see
+[Link](/docs/specs/otel/trace/api/#link).
+
 ### Span Status
 
-A status will be attached to a span. Typically, you will set a span status when
-there is a known error in the application code, such as an exception. A Span
-Status will be tagged as one of the following values:
+Each span has a status. The three possible values are:
 
 - `Unset`
-- `Ok`
 - `Error`
+- `Ok`
 
-When an exception is handled, a Span status can be set to Error. Otherwise, a
-Span status is in the Unset state. By setting a Span status to Unset, the
-back-end that processes spans can now assign a final status.
+The default value is `Unset`. A span status that is `Unset` means that the
+operation it tracked successfully completed without an error.
+
+When a span status is `Error`, then that means some error occurred in the
+operation it tracks. For example, this could be due to an HTTP 500 error on a
+server handling a request.
+
+When a span status is `Ok`, then that means the span was explicitly marked as
+error-free by the developer of an application. Although this is unintuitive,
+it's not required to set a span status as `Ok` when a span is known to have
+completed without error, as this is covered by `Unset`. What `Ok` does is
+represent an unambiguous "final call" on the status of a span that has been
+explicitly set by a user. This is helpful in any situation where a developer
+wishes for there to be no other interpretation of a span other than
+"successful".
+
+To reiterate: `Unset` represents a span that completed without an error. `Ok`
+represents when a developer explicitly marks a span as successful. In most
+cases, it is not necessary to explicitly mark a span as `Ok`.
 
 ### Span Kind
 
@@ -332,7 +369,7 @@ HTTP request or remote procedure call.
 #### Internal
 
 Internal spans represent operations which do not cross a process boundary.
-Things like instrumenting a function call or an express middleware may use
+Things like instrumenting a function call or an Express middleware may use
 internal spans.
 
 #### Producer
@@ -345,3 +382,8 @@ a local job handled by an event listener.
 
 Consumer spans represent the processing of a job created by a producer and may
 start long after the producer span has already ended.
+
+## Specification
+
+For more information, see the
+[traces specification](/docs/specs/otel/overview/#tracing-signal).

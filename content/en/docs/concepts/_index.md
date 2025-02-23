@@ -2,9 +2,9 @@
 title: OpenTelemetry Concepts
 linkTitle: Concepts
 description: Key concepts in OpenTelemetry
-aliases: [/docs/concepts/overview]
-weight: 2
+aliases: [concepts/overview]
+weight: 170
 ---
 
-In this section you'll learn about the data sources and key components of the
-OpenTelemetry project. This will help you understanding how OpenTelemetry works.
+This section covers data sources and key components of the OpenTelemetry
+project, which can help you understand how OpenTelemetry works.

@@ -1,6 +1,8 @@
 ---
 title: OpenTelemetry Marketing Guidelines for Contributing Organizations
 linkTitle: Marketing Guidelines
+weight: 999
+cSpell:ignore: devstats
 ---
 
 OpenTelemetry (aka OTel) is a collaboration among end-users, adjacent OSS
@@ -30,7 +32,7 @@ There are three high-level focus areas for these goals and guidelines.
 - Do’s:
   - Use project collateral such as logo and name in line with the Linux
     Foundation’s branding and
-    [trademark usage guidelines](https://www.linuxfoundation.org/trademark-usage/)
+    [trademark usage guidelines](https://www.linuxfoundation.org/legal/trademark-usage)
   - Emphasize that OTel would not be possible without collaboration from many
     contributors who happen to work for competing vendors and providers
   - Cite names of the other contributors and vendors involved with OTel efforts
@@ -85,7 +87,7 @@ concerns.
 Here is how we handle such circumstances:
 
 1. Whomever notices the relevant public (marketing) content should write an
-   email to cncf-opentelemetry-governance@lists.cncf.io and include an
+   email to <cncf-opentelemetry-governance@lists.cncf.io> and include an
    explanation of why the content is problematic, ideally referencing the
    [relevant guidelines above](#goals-and-guidelines).
 1. The OTel Governance Committee (GC) will discuss the case during its next

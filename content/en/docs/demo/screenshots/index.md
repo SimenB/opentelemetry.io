@@ -1,10 +1,10 @@
 ---
 title: Demo Screenshots
 linkTitle: Screenshots
-aliases: [/docs/demo/demo_screenshots]
+aliases: [demo_screenshots]
 ---
 
-## Webstore
+## Web store
 
 | Home Page                     | Checkout Screen               |
 | ----------------------------- | ----------------------------- |
@@ -28,12 +28,14 @@ aliases: [/docs/demo/demo_screenshots]
 
 | Prometheus Data Source                        | Jaeger Data Source                    |
 | --------------------------------------------- | ------------------------------------- |
-| ![Grafana-Prometheus](grafana-prometheus.png) | ![Gragana-jaeger](gragana-jaeger.png) |
-
-## Feature Flag UI
-
-![feature-flag-ui](feature-flag-ui.png)
+| ![Grafana-Prometheus](grafana-prometheus.png) | ![Grafana-jaeger](grafana-jaeger.png) |
 
 ## Load Generator UI
 
 ![load-generator-ui](load-generator-ui.png)
+
+## Flagd Configurator
+
+| Basic view                                           | Advanced view                                              |
+| ---------------------------------------------------- | ---------------------------------------------------------- |
+| ![flagd-ui-basic-view](flagd-configurator-basic.png) | ![flagd-ui-advanced-view](flagd-configurator-advanced.png) |

@@ -1,23 +1,24 @@
 ---
 title: Payment Service
 linkTitle: Payment
-aliases: [/docs/demo/services/paymentservice]
+aliases: [paymentservice]
+cSpell:ignore: nanos
 ---
 
 This service is responsible to process credit card payments for orders. It will
-return an error if the credit card is invalid or the payment can not be
+return an error if the credit card is invalid or the payment cannot be
 processed.
 
-[Payment service source](https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/paymentservice/)
+[Payment service source](https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/payment/)
 
 ## Initializing OpenTelemetry
 
 It is recommended to `require` Node.js app using an initializer file that
 initializes the SDK and auto-instrumentation. When initializing the
-OpenTelemetry NodeJS SDK in that module, you optionally specify which
+OpenTelemetry Node.js SDK in that module, you optionally specify which
 auto-instrumentation libraries to leverage, or make use of the
 `getNodeAutoInstrumentations()` function which includes most popular frameworks.
-The below example of an intiailizer file (`opentelemetry.js`) contains all code
+The below example of an initializer file (`opentelemetry.js`) contains all code
 required to initialize the SDK and auto-instrumentation based on standard
 OpenTelemetry environment variables for OTLP export, resource attributes, and
 service name. It then `require`s your app at `./index.js` to start it up once
@@ -86,7 +87,7 @@ You can then use `opentelemetry.js` to start your app. This can be done in the
 `ENTRYPOINT` command for the service's `Dockerfile`.
 
 ```dockerfile
-ENTRYPOINT [ "node", "./opentelemetry.js" ]
+ENTRYPOINT [ "node", "--require", "./opentelemetry.js", "./index.js" ]
 ```
 
 ## Traces

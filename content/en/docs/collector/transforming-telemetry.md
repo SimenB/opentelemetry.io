@@ -1,13 +1,15 @@
 ---
 title: Transforming telemetry
 weight: 26
+# prettier-ignore
+cSpell:ignore: accountid clustername k8sattributes metricstransform OTTL resourcedetection
 ---
 
 The OpenTelemetry Collector is a convenient place to transform data before
 sending it to a vendor or other systems. This is frequently done for data
-quality, goveranance, cost, and security reasons.
+quality, governance, cost, and security reasons.
 
-Processors available from the the
+Processors available from the
 [Collector Contrib repository](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor)
 support dozens of different transformations on metric, span and log data. The
 following sections provide some basic examples on getting started with a few
@@ -21,38 +23,35 @@ a significant impact on collector performance.
 **Processor**:
 [filter processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor)
 
-The filter processor allows users to filter telemetry based on `include` or
-`exclude` rules. Include rules are used for defining "allow lists" where
-anything that does _not_ match include rules is dropped from the collector.
-Exclude rules are used for defining "deny lists" where telemetry that matches
-rules is dropped from the collector.
+The filter processor allows users to filter telemetry using
+[OTTL](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/README.md).
+Telemetry that matches any condition is dropped.
 
 For example, to _only_ allow span data from services app1, app2, and app3 and
 drop data from all other services:
 
 ```yaml
 processors:
-  filter/allowlist:
-    spans:
-      include:
-        match_type: strict
-        services:
-          - app1
-          - app2
-          - app3
+  filter/ottl:
+    error_mode: ignore
+    traces:
+      span:
+        - |
+        resource.attributes["service.name"] != "app1" and
+        resource.attributes["service.name"] != "app2" and
+        resource.attributes["service.name"] != "app3"
 ```
 
-To only block spans from a service called development while allowing all other
-spans, an exclude rule is used:
+To only drop spans from a service called `service1` while keeping all other
+spans:
 
 ```yaml
 processors:
-  filter/denylist:
-    spans:
-      exclude:
-        match_type: strict
-        services:
-          - development
+  filter/ottl:
+    error_mode: ignore
+    traces:
+      span:
+        - resource.attributes["service.name"] == "service1"
 ```
 
 The
@@ -80,9 +79,9 @@ processors:
 ```
 
 The resource processor has an identical configuration, but applies only to
-[resource attributes](/docs/specs/otel/resource/semantic_conventions/). Use the
-resource processor to modify infrastructure metadata related to telemetry. For
-example, this inserts the Kubernetes cluster name:
+[resource attributes](/docs/specs/semconv/resource/). Use the resource processor
+to modify infrastructure metadata related to telemetry. For example, this
+inserts the Kubernetes cluster name:
 
 ```yaml
 processors:
@@ -108,15 +107,15 @@ but also supports renaming and other metric-specific functionality.
 processors:
   metricstransform/rename:
     transforms:
-      include: system.cpu.usage
-      action: update
-      new_name: system.cpu.usage_time
+      - include: system.cpu.usage
+        action: update
+        new_name: system.cpu.usage_time
 ```
 
 The
 [metrics transform processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/metricstransformprocessor)
-also supports regexes to apply transform rules to multiple metric names or
-metric labels at the same time. This example renames cluster_name to
+also supports regular expressions to apply transform rules to multiple metric
+names or metric labels at the same time. This example renames cluster_name to
 cluster-name for all metrics:
 
 ```yaml
@@ -155,7 +154,7 @@ processors:
     override: false
 ```
 
-Similarly, the k8s processor enriches telemetry with relevant Kubernetes
+Similarly, the K8s processor enriches telemetry with relevant Kubernetes
 metadata like pod name, node name, or workload name. The collector pod must be
 configured to have read access to certain Kubernetes RBAC APIs, which is
 documented
@@ -166,6 +165,31 @@ To use the default options, it can be configured with an empty block:
 processors:
   k8sattributes/default:
 ```
+
+## Setting a span status
+
+**Processor**:
+[transform processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/transformprocessor)
+
+Use the transform processor to set a span's status. The following example sets
+the span status to `Ok` when the `http.request.status_code` attribute is 400:
+
+<!-- prettier-ignore-start -->
+
+```yaml
+transform:
+  error_mode: ignore
+  trace_statements:
+    - set(span.status.code, STATUS_CODE_OK) where span.attributes["http.request.status_code"] == 400
+```
+
+<!-- prettier-ignore-end -->
+
+You can also use the transform processor to modify the span name based on its
+attributes or extract span attributes from the span name. For examples, see an
+example
+[config file](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/9b28f76c02c18f7479d10e4b6a95a21467fd85d6/processor/transformprocessor/testdata/config.yaml)
+file for the transform processor.
 
 ## Advanced Transformations
 

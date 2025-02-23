@@ -1,12 +1,13 @@
 ---
 title: Architecture Requirements
 linkTitle: Architecture
-aliases: [/docs/demo/requirements/architecture_requirements]
+aliases: [architecture_requirements]
+cSpell:ignore: dockerstatsreceiver
 ---
 
 ## Summary
 
-The OpenTelemetry Community Demo application is intended to be a 'showcase' for
+The OpenTelemetry Community Demo application is intended to be a showcase for
 OpenTelemetry API, SDK, and tools in a production-lite cloud native application.
 The overall goal of this application is not only to provide a canonical 'demo'
 of OpenTelemetry components, but also to act as a framework for further
@@ -42,7 +43,7 @@ HTTP and runs on Kubernetes (or Docker, locally).
 Each service shall be instrumented with OpenTelemetry for traces, metrics, and
 logs (as applicable/available).
 
-Each service should be 'swappable' with a service that performs the same
+Each service should be interchangeable with a service that performs the same
 business logic, implementing the same gRPC endpoints, but written in a different
 language/implementation. For the initial implementation of the demo, we should
 focus on adding as many missing languages as possible by swapping out existing
@@ -67,28 +68,22 @@ application written in Swift.
 
 ## Feature Flag Component
 
-This component should consist of one (or more) services that provides a simple
-feature flag configuration utility for the main application. It is made up of a
-browser-based client/admin interface and a backend service or services. The role
-of the client is to allow an operator to visualize the available feature flags
-and toggle their state. The server should provide a catalog of feature flags
-that main application services can register with and interrogate for their
-current status and targeting rules.
+Feature flagging is a crucial part of cloud native application development. The
+demo uses OpenFeature, a CNCF incubating project, to manage feature flags.
 
-The feature flag component should be implemented as an Erlang+Elixir/Phoenix
-service. The catalog of feature flags should be stored in a Database.
+Feature flags can be set through the flagd configurator user interface.
 
 ## Orchestration and Deployment
 
 All services should run on Kubernetes. The OpenTelemetry Collector should be
 deployed via the OpenTelemetry Operator, and run in a sidecar + gateway mode.
 Telemetry from each pod should be routed from agents to a gateway, and the
-gateway should export telemetry by default to an open-source trace + metrics
+gateway should export telemetry by default to an open source trace + metrics
 visualizer.
 
-For local/non-kubernetes deployment, the Collector should be deployed via
+For local/non-Kubernetes deployment, the Collector should be deployed via
 compose file and monitor not only traces/metrics from applications, but also the
-docker containers via dockerstatsreceiver.
+docker containers via `dockerstatsreceiver`.
 
 A design goal of this project is to include a CI/CD pipeline for self-deployment
 into cloud environments. This could be skipped for local development.
