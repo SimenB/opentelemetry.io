@@ -1,13 +1,14 @@
 ---
 title: Currency Service
 linkTitle: Currency
-aliases: [/docs/demo/services/currencyservice]
+aliases: [currencyservice]
+cSpell:ignore: decltype labelkv noexcept nostd
 ---
 
 This service provides functionality to convert amounts between different
 currencies.
 
-[Currency service source](https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/currencyservice/)
+[Currency service source](https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/currency/)
 
 ## Traces
 
@@ -47,15 +48,15 @@ you need to start and put it into active context using
 function.
 
 ```cpp
-    std::string span_name = "CurrencyService/Convert";
-    auto span =
-        get_tracer("currencyservice")->StartSpan(span_name,
-                                      {{SemanticConventions::kRpcSystem, "grpc"},
-                                       {SemanticConventions::kRpcService, "CurrencyService"},
-                                       {SemanticConventions::kRpcMethod, "Convert"},
-                                       {SemanticConventions::kRpcGrpcStatusCode, 0}},
-                                      options);
-    auto scope = get_tracer("currencyservice")->WithActiveSpan(span);
+std::string span_name = "CurrencyService/Convert";
+auto span =
+    get_tracer("currencyservice")->StartSpan(span_name,
+                                  {{SemanticConventions::kRpcSystem, "grpc"},
+                                   {SemanticConventions::kRpcService, "oteldemo.CurrencyService"},
+                                   {SemanticConventions::kRpcMethod, "Convert"},
+                                   {SemanticConventions::kRpcGrpcStatusCode, 0}},
+                                  options);
+auto scope = get_tracer("currencyservice")->WithActiveSpan(span);
 ```
 
 ### Adding attributes to spans
@@ -63,8 +64,8 @@ function.
 You can add an attribute to a span using `Span->SetAttribute(key, value)`.
 
 ```cpp
-    span->SetAttribute("app.currency.conversion.from", from_code);
-    span->SetAttribute("app.currency.conversion.to", to_code);
+span->SetAttribute("app.currency.conversion.from", from_code);
+span->SetAttribute("app.currency.conversion.to", to_code);
 ```
 
 ### Add span events
@@ -72,16 +73,16 @@ You can add an attribute to a span using `Span->SetAttribute(key, value)`.
 Adding span events is accomplished using `Span->AddEvent(name)`.
 
 ```cpp
-    span->AddEvent("Conversion successful, response sent back");
+span->AddEvent("Conversion successful, response sent back");
 ```
 
 ### Set span status
 
-Make sure to set your span status to Ok, or Error accordingly. You can do this
-using `Span->SetStatus(status)`
+Make sure to set your span status to `Ok`, or `Error` accordingly. You can do
+this using `Span->SetStatus(status)`
 
 ```cpp
-    span->SetStatus(StatusCode::kOk);
+span->SetStatus(StatusCode::kOk);
 ```
 
 ### Tracing context propagation
@@ -125,14 +126,14 @@ This class is leveraged in the `Convert` method to extract context and create a
 creating new spans.
 
 ```cpp
-    StartSpanOptions options;
-    options.kind = SpanKind::kServer;
-    GrpcServerCarrier carrier(context);
+StartSpanOptions options;
+options.kind = SpanKind::kServer;
+GrpcServerCarrier carrier(context);
 
-    auto prop        = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-    auto current_ctx = context::RuntimeContext::GetCurrent();
-    auto new_context = prop->Extract(carrier, current_ctx);
-    options.parent   = GetSpan(new_context)->GetContext();
+auto prop        = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+auto current_ctx = context::RuntimeContext::GetCurrent();
+auto new_context = prop->Extract(carrier, current_ctx);
+options.parent   = GetSpan(new_context)->GetContext();
 ```
 
 ## Metrics
@@ -147,16 +148,10 @@ void initMeter()
 {
   // Build MetricExporter
   otlp_exporter::OtlpGrpcMetricExporterOptions otlpOptions;
-
-  // Configuration via environment variable not supported yet
-  otlpOptions.endpoint = "otelcol:4317";
-  otlpOptions.aggregation_temporality = metric_sdk::AggregationTemporality::kDelta;
   auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(otlpOptions);
 
   // Build MeterProvider and Reader
   metric_sdk::PeriodicExportingMetricReaderOptions options;
-  options.export_interval_millis = std::chrono::milliseconds(1000);
-  options.export_timeout_millis = std::chrono::milliseconds(500);
   std::unique_ptr<metric_sdk::MetricReader> reader{
       new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options) };
   auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
@@ -204,4 +199,38 @@ CurrencyCounter(to_code);
 
 ## Logs
 
-TBD
+The OpenTelemetry `LoggerProvider` is initialized from `main()` using the
+`initLogger()` function defined in `logger_common.h`.
+
+```cpp
+void initLogger() {
+  otlp::OtlpGrpcLogRecordExporterOptions loggerOptions;
+  auto exporter  = otlp::OtlpGrpcLogRecordExporterFactory::Create(loggerOptions);
+  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
+  std::vector<std::unique_ptr<logs_sdk::LogRecordProcessor>> processors;
+  processors.push_back(std::move(processor));
+  auto context = logs_sdk::LoggerContextFactory::Create(std::move(processors));
+  std::shared_ptr<logs::LoggerProvider> provider = logs_sdk::LoggerProviderFactory::Create(std::move(context));
+  opentelemetry::logs::Provider::SetLoggerProvider(provider);
+}
+```
+
+### Using the LoggerProvider
+
+The initialized Logger Provider is called from `main` in `server.cpp`:
+
+```cpp
+logger = getLogger(name);
+```
+
+It assigns the logger to a local variable called `logger`:
+
+```cpp
+nostd::shared_ptr<opentelemetry::logs::Logger> logger;
+```
+
+Which is then used throughout the code whenever we need to log a line:
+
+```cpp
+logger->Info(std::string(__func__) + " conversion successful");
+```

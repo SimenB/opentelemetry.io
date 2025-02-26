@@ -1,19 +1,22 @@
 ---
 title: Docker deployment
 linkTitle: Docker
-aliases: [/docs/demo/docker_deployment]
+aliases: [docker_deployment]
+cSpell:ignore: otlphttp spanmetrics tracetest tracetesting
 ---
+
+<!-- markdownlint-disable code-block-style ol-prefix -->
 
 ## Prerequisites
 
 - Docker
-- [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
-  v2.0.0+
-- 4 GB of RAM for the application
+- [Docker Compose](https://docs.docker.com/compose/install/) v2.0.0+
+- Make (optional)
+- 6 GB of RAM for the application
 
 ## Get and run the demo
 
-1.  Clone the Webstore Demo repository:
+1.  Clone the Demo repository:
 
     ```shell
     git clone https://github.com/open-telemetry/opentelemetry-demo.git
@@ -25,37 +28,77 @@ aliases: [/docs/demo/docker_deployment]
     cd opentelemetry-demo/
     ```
 
-3.  Run docker compose to start the demo:
+3.  Start the demo[^1]:
 
-    ```shell
-    docker compose up --no-build
-    ```
+    {{< tabpane text=true >}} {{% tab Make %}}
 
-    > **Notes:**
-    >
-    > - The `--no-build` flag is used to fetch released docker images from
-    >   [ghcr](https://ghcr.io/open-telemetry/demo) instead of building from
-    >   source. Removing the `--no-build` command line option will rebuild all
-    >   images from source. It may take more than 20 minutes to build if the
-    >   flag is omitted.
-    > - If you're running on Apple Silicon, run `docker compose build` in order
-    >   to create local images vs. pulling them from the repository.
+```shell
+make start
+```
 
-## Verify the Webstore and Telemetry
+    {{% /tab %}} {{% tab Docker %}}
+
+```shell
+docker compose up --force-recreate --remove-orphans --detach
+```
+
+    {{% /tab %}} {{< /tabpane >}}
+
+4.  (Optional) Enable API observability-driven testing[^1]:
+
+    {{< tabpane text=true >}} {{% tab Make %}}
+
+```shell
+make run-tracetesting
+```
+
+    {{% /tab %}} {{% tab Docker %}}
+
+```shell
+docker compose -f docker-compose-tests.yml run traceBasedTests
+```
+
+    {{% /tab %}} {{< /tabpane >}}
+
+## Verify the web store and Telemetry
 
 Once the images are built and containers are started you can access:
 
-- Webstore: <http://localhost:8080/>
+- Web store: <http://localhost:8080/>
 - Grafana: <http://localhost:8080/grafana/>
-- Feature Flags UI: <http://localhost:8080/feature/>
 - Load Generator UI: <http://localhost:8080/loadgen/>
 - Jaeger UI: <http://localhost:8080/jaeger/ui/>
+- Tracetest UI: <http://localhost:11633/>, only when using
+  `make run-tracetesting`
+- Flagd configurator UI: <http://localhost:8080/feature>
+
+## Changing the demo's primary port number
+
+By default, the demo application will start a proxy for all browser traffic
+bound to port 8080. To change the port number, set the `ENVOY_PORT` environment
+variable before starting the demo.
+
+- For example, to use port 8081[^1]:
+
+  {{< tabpane text=true >}} {{% tab Make %}}
+
+```shell
+ENVOY_PORT=8081 make start
+```
+
+    {{% /tab %}} {{% tab Docker %}}
+
+```shell
+ENVOY_PORT=8081 docker compose up --force-recreate --remove-orphans --detach
+```
+
+    {{% /tab %}} {{< /tabpane >}}
 
 ## Bring your own backend
 
-Likely you want to use the Webstore as a demo application for an observability
+Likely you want to use the web store as a demo application for an observability
 backend you already have (e.g., an existing instance of Jaeger, Zipkin, or one
-of the [vendor of your choice](/ecosystem/vendors/).
+of the [vendors of your choice](/ecosystem/vendors/)).
 
 OpenTelemetry Collector can be used to export telemetry data to multiple
 backends. By default, the collector in the demo application will merge the
@@ -65,7 +108,7 @@ configuration from two files:
 - `otelcol-config-extras.yml`
 
 To add your backend, open the file
-[src/otelcollector/otelcol-config-extras.yml](https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/otelcollector/otelcol-config-extras.yml)
+[src/otel-collector/otelcol-config-extras.yml](https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/otel-collector/otelcol-config-extras.yml)
 with an editor.
 
 - Start by adding a new exporter. For example, if your backend supports OTLP
@@ -77,16 +120,20 @@ with an editor.
       endpoint: <your-endpoint-url>
   ```
 
-- Then add a new pipeline with your new exporter:
+- Then override the `exporters` for telemetry pipelines that you want to use for
+  your backend.
 
   ```yaml
   service:
     pipelines:
       traces:
-        receivers: [otlp]
-        processors: [batch]
-        exporters: [otlphttp/example]
+        exporters: [spanmetrics, otlphttp/example]
   ```
+
+{{% alert title="Note" color="info" %}} When merging YAML values with the
+Collector, objects are merged and arrays are replaced. The `spanmetrics`
+exporter must be included in the array of exporters for the `traces` pipeline if
+overridden. Not including this exporter will result in an error. {{% /alert %}}
 
 Vendor backends might require you to add additional parameters for
 authentication, please check their documentation. Some backends require
@@ -94,5 +141,7 @@ different exporters, you may find them and their documentation available at
 [opentelemetry-collector-contrib/exporter](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter).
 
 After updating the `otelcol-config-extras.yml`, start the demo by running
-`docker compose up`. After a while, you should see the traces flowing into your
-backend as well.
+`make start`. After a while, you should see the traces flowing into your backend
+as well.
+
+[^1]: {{% param notes.docker-compose-v2 %}}

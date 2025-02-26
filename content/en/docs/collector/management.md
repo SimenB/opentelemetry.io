@@ -2,18 +2,19 @@
 title: Management
 description: How to manage your OpenTelemetry collector deployment at scale
 weight: 23
+cSpell:ignore: AFVGQT backpressure distro GRRKNBJE hostmetrics
 ---
 
-This document describes how you can manage your OpenTelemetry collector
+This document describes how you can manage your OpenTelemetry Collector
 deployment at scale.
 
 To get the most out of this page you should know how to install and configure
 the collector. These topics are covered elsewhere:
 
-- [Getting Started][otel-collector-getting-started] to understand how to install
-  the OpenTelemetry collector.
-- [Configuration][otel-collector-configuration] for how to configure the
-  OpenTelemetry collector, setting up telemetry pipelines.
+- [Quick Start](/docs/collector/quick-start/) to understand how to install the
+  OpenTelemetry Collector.
+- [Configuration] for how to configure the OpenTelemetry Collector, setting up
+  telemetry pipelines.
 
 ## Basics
 
@@ -23,8 +24,7 @@ Typical agent management tasks include:
 1. Querying the agent information and configuration. The agent information can
    include its version, operating system related information, or capabilities.
    The configuration of the agent refers to its telemetry collection setup, for
-   example, the OpenTelemetry collector
-   [configuration][otel-collector-configuration].
+   example, the OpenTelemetry Collector [configuration].
 1. Upgrading/downgrading agents and management of agent-specific packages,
    including the base agent functionality and plugins.
 1. Applying new configurations to agents. This might be required because of
@@ -43,12 +43,12 @@ ideally done using OpenTelemetry.
 
 Observability vendors and cloud providers offer proprietary solutions for agent
 management. In the open source observability space, there is an emerging
-standard that you can use for agent management: Open Agent Management Protocol
+standard that you can use for agent management: [Open Agent Management Protocol]
 (OpAMP).
 
-The [OpAMP specification][opamp-spec] defines how to manage a fleet of telemetry
-data agents. These agents can be [OpenTelemetry collectors][otel-collector],
-Fluent Bit or other agents in any arbitrary combination.
+The [OpAMP specification] defines how to manage a fleet of telemetry data
+agents. These agents can be [OpenTelemetry Collectors](/docs/collector/), Fluent
+Bit or other agents in any arbitrary combination.
 
 > **Note** The term "agent" is used here as a catch-all term for OpenTelemetry
 > components that respond to OpAMP, this could be the collector but also SDK
@@ -61,7 +61,7 @@ WebSockets:
   orchestrator, managing a fleet of telemetry agents.
 - The **OpAMP client** is part of the data plane. The client side of OpAMP can
   be implemented in-process, for example, as the case in [OpAMP support in the
-  OpenTelemetry collector][opamp-in-otel-collector]. The client side of OpAMP
+  OpenTelemetry Collector][opamp-in-otel-collector]. The client side of OpAMP
   could alternatively be implemented out-of-process. For this latter option, you
   can use a supervisor that takes care of the OpAMP specific communication with
   the OpAMP server and at the same time controls the telemetry agent, for
@@ -72,7 +72,7 @@ Let's have a look at a concrete setup:
 
 ![OpAMP example setup](../img/opamp.svg)
 
-1. The OpenTelemetry collector, configured with pipeline(s) to:
+1. The OpenTelemetry Collector, configured with pipeline(s) to:
    - (A) receive signals from downstream sources
    - (B) export signals to upstream destinations, potentially including
      telemetry about the collector itself (represented by the OpAMP `own_xxx`
@@ -86,16 +86,16 @@ implementation in Go][opamp-go]. For the following walkthrough you will need to
 have Go in version 1.19 or above available.
 
 We will set up a simple OpAMP control plane consisting of an example OpAMP
-server and let an OpenTelemetry collector connect to it via an example OpAMP
+server and let an OpenTelemetry Collector connect to it via an example OpAMP
 supervisor.
 
-First, clone the `open-telemetry/opamp-go` repo:
+First, clone the `open-telemetry/opamp-go` repository:
 
 ```sh
 git clone https://github.com/open-telemetry/opamp-go.git
 ```
 
-Next, we need an OpenTelemetry collector binary that the OpAMP supervisor can
+Next, we need an OpenTelemetry Collector binary that the OpAMP supervisor can
 manage. For that, install the [OpenTelemetry Collector Contrib][otelcolcontrib]
 distro. The path to the collector binary (where you installed it into) is
 referred to as `$OTEL_COLLECTOR_BINARY` in the following.
@@ -110,7 +110,7 @@ $ go run .
 
 In the `./opamp-go/internal/examples/supervisor` directory create a file named
 `supervisor.yaml` with the following content (telling the supervisor where to
-find the server and what OpenTelemetry collector binary to manage):
+find the server and what OpenTelemetry Collector binary to manage):
 
 ```yaml
 server:
@@ -146,18 +146,19 @@ receivers:
       network:
 
 exporters:
-  logging:
+  # NOTE: Prior to v0.86.0 use `logging` instead of `debug`.
+  debug:
     verbosity: detailed
 
 service:
   pipelines:
     metrics:
       receivers: [hostmetrics, prometheus/own_metrics]
-      exporters: [logging]
+      exporters: [debug]
 ```
 
 Now it's time to launch the supervisor (which in turn will launch your
-OpenTelemetry collector):
+OpenTelemetry Collector):
 
 ```console
 $ go run .
@@ -214,10 +215,9 @@ otelcol_receiver_refused_metric_points{receiver="prometheus/own_metrics",service
     Protocol][opamp-lt]
   - [What is OpAMP & What is BindPlane][opamp-bindplane]
 
-[otel-collector]: /docs/collector/
-[otel-collector-getting-started]: /docs/collector/getting-started
-[otel-collector-configuration]: /docs/collector/configuration
-[opamp-spec]:
+[configuration]: /docs/collector/configuration/
+[Open Agent Management Protocol]: https://github.com/open-telemetry/opamp-spec/
+[OpAMP specification]:
   https://github.com/open-telemetry/opamp-spec/blob/main/specification.md
 [opamp-in-otel-collector]:
   https://docs.google.com/document/d/1KtH5atZQUs9Achbce6LiOaJxLbksNJenvgvyKLsJrkc/edit#heading=h.ioikt02qpy5f

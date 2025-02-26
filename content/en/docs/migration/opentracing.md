@@ -1,8 +1,8 @@
 ---
 title: Migrating from OpenTracing
 linkTitle: OpenTracing
-spelling: cSpell:ignore codebases opentracing
 weight: 2
+cSpell:ignore: codebases
 ---
 
 Backward compatibility with [OpenTracing][] has been a priority for the
@@ -25,7 +25,7 @@ of the OpenTracing and OpenTelemetry APIs are listed in the table below.
 | [Go][]         | 1.13            | 1.16              |
 | [Java][]       | 7               | 8                 |
 | [Python][]     | 2.7             | 3.6               |
-| [Javascript][] | 6               | 8.5               |
+| [JavaScript][] | 6               | 8.5               |
 | [.NET][]       | 1.3             | 1.4               |
 | [C++][]        | 11              | 11                |
 
@@ -157,9 +157,9 @@ be switched to OpenTelemetry at the same time. Be sure to check that any
 critical baggage items are still being propagated before rolling these changes
 into production.
 
-### Context management in Javascript
+### Context management in JavaScript
 
-In Javascript, the OpenTelemetry API makes use of commonly available context
+In JavaScript, the OpenTelemetry API makes use of commonly available context
 managers, such as `async_hooks` for Node.js and `Zones.js` for the browser.
 These context managers make tracing instrumentation a much less invasive and
 onerous task, compared to adding a span as a parameter to every method which
@@ -181,7 +181,7 @@ For details on how each OpenTracing shim works, see the appropriate
 language-specific documentation. For details on the design of the OpenTracing
 shim, see [OpenTracing Compatibility][ot_spec].
 
-[.net]: /docs/instrumentation/net/shim/
+[.net]: /docs/languages/net/shim/
 [go]: https://pkg.go.dev/go.opentelemetry.io/otel/bridge/opentracing
 [java]:
   https://github.com/open-telemetry/opentelemetry-java/tree/main/opentracing-shim

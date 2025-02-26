@@ -4,6 +4,7 @@ linkTitle: 'End-User Q&A: OTel at Uplight'
 date: 2023-03-20
 author: '[Adriana Villela](https://github.com/avillela) (Lightstep)'
 body_class: otel-with-contributions-from
+cSpell:ignore: hackathons Uplight
 ---
 
 With contributions from [Rynn Mancuso](https://github.com/musingvirtual)
@@ -84,7 +85,7 @@ started by getting developers to add
 [OpenTelemetry (structured) logs](/docs/specs/otel/logs/) to all of the services
 across their various platforms. In order to leverage OTel logs, developers had
 to add the
-[OpenTelemetry language-specific SDKs](/docs/concepts/sdk-configuration/) into
+[OpenTelemetry language-specific SDKs](/docs/languages/sdk-configuration/) into
 their code. Once they got past that initial hump and got the SDKs into their
 code, it then became easier for developers to add
 [other signals](/docs/concepts/signals/) (such as
@@ -134,9 +135,9 @@ experience OpenTelemetry in action:
 - Seeing structured logs, being able to correlate traces and logs, and emitting
   metrics.
 - Experiencing the benefits of
-  [context propagation](/docs/instrumentation/js/propagation/) – i.e. spans and
-  traces interacting across different operations to provide an end-to-end view
-  of a service call.
+  [context propagation](/docs/languages/js/propagation/) – i.e. spans and traces
+  interacting across different operations to provide an end-to-end view of a
+  service call.
 
 ### How did you promote OpenTelemetry across the organization?
 
@@ -191,9 +192,9 @@ Uplight currently has a few different Collector configurations:
 - Collectors running standalone as some
   [sidecars](https://github.com/open-telemetry/opentelemetry-operator#deployment-modes)
 - For larger Kubernetes clusters, there’s a
-  [Collector running in each cluster](/docs/collector/getting-started/#kubernetes)
+  [Collector running in each cluster](/docs/collector/installation/#kubernetes)
 - Developers running their own Collectors
-  [locally with Docker](/docs/collector/getting-started/#docker)
+  [locally with Docker](/docs/collector/installation/#docker)
 
 Doug’s ultimate goal is for any deployment in any environment to be able to
 easily send telemetry to an
@@ -245,8 +246,8 @@ World” program to send data to the Collector, and nothing is showing up, and
 need some guidance around this. How do we help folks who aren’t super familiar
 with Docker and aren’t super familiar with OpenTelemetry? Can we have some super
 simple reference implementations to hold folks’ hands as they get started? For
-example, for a Ruby developer, clone X repo, run `docker-compose up`, and
-everything should be up and running. That way, they can focus on learning
+example, for a Ruby developer, clone X repository, run `docker compose up`[^1],
+and everything should be up and running. That way, they can focus on learning
 OpenTelemetry, rather than mess around with Docker networking and other
 distracting things.
 
@@ -273,7 +274,7 @@ him in the
 channel!
 
 Also, be sure to check out more of Doug's OTel adventures at this month's
-[OTel in Practice series, on March 27th, 09:00 PT/11:00 ET](http://surl.li/fqdox).
+[OTel in Practice series, on March 27th, 09:00 PT/11:00 ET](https://surl.li/fqdox).
 
 ## Final Thoughts
 
@@ -302,3 +303,5 @@ Be sure to follow OpenTelemetry on
 [Mastodon](https://fosstodon.org/@opentelemetry) and
 [Twitter](https://twitter.com/opentelemetry), and share your stories using the
 **#OpenTelemetry** hashtag!
+
+[^1]: {{% param notes.docker-compose-v2 %}}

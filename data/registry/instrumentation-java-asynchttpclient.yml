@@ -1,14 +1,18 @@
-title: Async Http Client Instrumentation
+title: Async HTTP Client Instrumentation
 registryType: instrumentation
-isThirdParty: false
 language: java
 tags:
-  - asynchttpclient
+  - async
+  - http
+  - client
   - instrumentation
   - java
-repo: https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/async-http-client
 license: Apache 2.0
 description:
-  This package provides an instrumentation library for Async Http Client
-authors: OpenTelemetry Authors
-otVersion: latest
+  This package provides an instrumentation library for Async HTTP Client
+authors:
+  - name: OpenTelemetry Authors
+urls:
+  repo: https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/async-http-client
+createdAt: 2022-10-27
+isFirstParty: false

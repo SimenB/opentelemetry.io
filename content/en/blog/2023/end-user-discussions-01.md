@@ -3,13 +3,14 @@ title: OpenTelemetry End-User Discussions Summary for January 2023
 linkTitle: End-User Discussions Jan 2023
 date: 2023-01-27
 author: '[Adriana Villela](https://github.com/avillela) (Lightstep)'
-aliases: [/blog/2023/otel-end-user-discussions-january-2023]
+aliases: [otel-end-user-discussions-january-2023]
 body_class: otel-with-contributions-from
+cSpell:ignore: january OTTL
 ---
 
 With contributions from [Henrik Rexed](https://github.com/henrikrexed)
 (Dynatrace), [Michael Hausenblas](https://github.com/mhausenblas) (AWS),
-[Pranay Prateek](https://github.com/pranay01) (Signoz),
+[Pranay Prateek](https://github.com/pranay01) (SigNoz),
 [Rynn Mancuso](https://github.com/musingvirtual) (Honeycomb), and
 [Reese Lee](https://github.com/reese-lee) (New Relic).
 
@@ -19,7 +20,7 @@ they use OpenTelemetry in real life. Sessions are held for users in the Americas
 discussions take place using a
 [Lean Coffee format](https://agilecoffee.com/leancoffee/), whereby folks are
 invited to post their topics to the
-[Agile Coffee board like this one](http://agile.coffee/#b3b37364-d40e-4029-847c-8ee059d60855),
+[Agile Coffee board like this one](http://agile.coffee/?disable_http_check#b3b37364-d40e-4029-847c-8ee059d60855),
 and everyone in attendance votes on what they want to talk about.
 
 This is a great way to meet other users in the OpenTelemetry community, and to
@@ -54,7 +55,7 @@ Below is a summary of this month’s discussions.
 
 **Q:** Will exporters support
 [OTTL](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/pkg/ottl)
-(a language for transforming open telemetry data)? Use case: data needs to be
+(a language for transforming OpenTelemetry data)? Use case: data needs to be
 transformed, but don’t want to do it in a processor.
 
 **A:** Due to separation of concerns, it is unlikely that OTTL will be added to
@@ -81,7 +82,7 @@ you will have to send the spans to a centralized service.
 #### 3- Bifurcating data in a pipeline
 
 **Q:** If I want to use the Collector to send different sets of data to
-different back-ends, what’s the best way to go about it?
+different backends, what’s the best way to go about it?
 
 **A:**
 [Connectors](https://github.com/open-telemetry/opentelemetry-collector/pull/6140)
@@ -158,7 +159,7 @@ find a channel for your language, feel free to start a discussion on the
 [OpenTelemetry CNCF Slack channel](https://cloud-native.slack.com/archives/CJFCJHG4Q),
 or on [GitHub](https://github.com/open-telemetry/community), like with
 [this issue for OTel for Perl](https://github.com/open-telemetry/community/issues/828).
-Please also check out [this page](/docs/instrumentation/other/) for more info.
+Please also check out [this page](/docs/languages/other/) for more info.
 
 #### 2- Python instrumentation
 
@@ -169,7 +170,7 @@ experience of folks working with OpenTelemetry Python?
 using OTel Python in production, so it likely won’t cause any issues in prod. As
 a SIG, OTel Python tries to minimize shipping breaking changes, but as with
 everything, there is no guarantee that there will be no breaking changes. There
-is no firm timeframe on when Python instrumentation will be marked as stable.
+is no firm time frame on when Python instrumentation will be marked as stable.
 
 ### Misc Items
 
@@ -184,7 +185,7 @@ OpenTelemetry [metrics](/docs/concepts/signals/metrics/) to
 [traces](/docs/concepts/signals/traces/). Exemplars are currently in the early
 stages of development, and more work still needs to be done. For more on the
 state of exemplars, check out the
-[#otel-metrics channel on CNCF ](https://cloud-native.slack.com/archives/C01NP3BV26R)Slack.
+[#otel-metrics channel on CNCF](https://cloud-native.slack.com/archives/C01NP3BV26R)Slack.
 Please also check out
 [Michael Hausenblas’ recent talk on this topic](https://www.slideshare.net/Altinity/osa-con-2022-signal-correlation-the-ho11y-grail-michael-hausenblas-awspdf).
 
@@ -195,8 +196,8 @@ Please also check out
 **A:** Implementing correlation takes time and is a work in progress.
 Correlation work is more mature for some languages (e.g. Java, Go) than for
 others. The best approach is to raise this issue in one of the language-specific
-repos that pertains to your situation. A possible work-around is to start traces
-at the log level, whereby every log will have its own associated trace.
+repositories that pertains to your situation. A possible workaround is to start
+traces at the log level, whereby every log will have its own associated trace.
 
 #### 3- Profiling
 
@@ -205,7 +206,7 @@ at the log level, whereby every log will have its own associated trace.
 **A:** There is an OTel proposal on profiling, which has been accepted and is
 being actively being worked on and discussed. The current focus is on finalizing
 the protocol, before SDK work can start. You can check out the
-[profiling repo on GitHub](https://github.com/open-telemetry/opentelemetry-profiling),
+[profiling repository on GitHub](https://github.com/open-telemetry/opentelemetry-profiling),
 as well as the
 [Profiling Vision pull request on GitHub](https://github.com/open-telemetry/oteps/pull/212).
 
