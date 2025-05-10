@@ -1,3 +1,7 @@
+---
+default_lang_commit: 7d0c3f247ee77671d1135b0af535a2aca05fe359
+---
+
 ## Jaeger
 
 ### Configuração do Backend {#jaeger-backend-setup}
