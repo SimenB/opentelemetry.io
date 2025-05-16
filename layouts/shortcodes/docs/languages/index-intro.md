@@ -1,7 +1,3 @@
-{{ $prettier_ignore := `
-
-<!-- prettier-ignore -->
-` -}}
 {{ $lang := .Get 0 -}}
 {{ $data := index $.Site.Data.instrumentation $lang }}
 {{ $name := $data.name -}}
@@ -21,4 +17,4 @@
     ".Inner" .Inner
 -}}
 
-{{ partial "include.md" $args -}}
+{{ partial "include" $args -}}
