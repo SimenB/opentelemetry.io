@@ -9,8 +9,8 @@ cSpell:ignore: backendsystem crand debugexporter loggingexporter mapstructure pc
 <!-- markdownlint-disable heading-increment no-duplicate-heading -->
 
 If you are reading this tutorial, you probably already have an idea of the
-OpenTelemetry concepts behind distributed tracing, but if you don't you can
-quickly read through it [here](/docs/concepts/signals/traces/).
+OpenTelemetry concepts behind
+[distributed tracing](/docs/concepts/signals/traces/).
 
 Here is the definition of those concepts according to OpenTelemetry:
 
@@ -198,8 +198,8 @@ go mod init github.com/open-telemetry/opentelemetry-tutorials/trace-receiver/tai
 >
 > 1. The module path above is a mock path, which can be your desired private or
 >    public path.
-> 2. The initial code is hosted
->    [here](https://github.com/rquedas/otel4devs/tree/main/collector/receiver/trace-receiver).
+> 2. See the
+>    [initial trace-receiver code](https://github.com/rquedas/otel4devs/tree/main/collector/receiver/trace-receiver).
 
 It's recommended to enable Go
 [Workspaces](https://go.dev/doc/tutorial/workspaces) since we're going to manage
@@ -279,7 +279,7 @@ type Config struct {
 Now that you have access to the settings, you can provide any kind of validation
 needed for those values by implementing the `Validate` method according to the
 optional
-[ConfigValidator](<https://github.com/open-telemetry/opentelemetry-collector/blob/v{{% param vers %}}/component/config.go#L50>)
+[ConfigValidator](https://github.com/open-telemetry/opentelemetry-collector/blob/677b87e3ab5c615bc3f93b8f99bb1fa5be951751/component/config.go#L28)
 interface.
 
 In this case, the `interval` value will be optional (we will look at generating
